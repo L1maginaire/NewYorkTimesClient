@@ -73,12 +73,12 @@ public class Fetcher {
             String jsonString = getUrlString(url);
             parseItemsViaGson(items, jsonString);
         } catch (IOException ioe) {
-            Log.e("BLA", "Failed to fetch items", ioe);
+            Log.e("TAG", "Failed to fetch items", ioe);
         }
         return items;
     }
 
-    private String buildUrl() {
+    static public String buildUrl() {
         return ENDPOINT.toString();
     }
 
