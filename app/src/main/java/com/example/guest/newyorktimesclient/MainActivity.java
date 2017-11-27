@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
+import com.example.guest.newyorktimesclient.Model.NewsArr;
 import com.example.guest.newyorktimesclient.Model.Result;
 import com.google.gson.Gson;
 
@@ -39,15 +40,16 @@ public class MainActivity extends AppCompatActivity {
         Adapter adapter = new Adapter(news);
         recyclerView.setAdapter(adapter);
 
-        App.getApi().getData(10, API_KEY).enqueue(new Callback<List<Result>>() {
+        //Fix Изменения связанные с апи
+        App.getApi().getData(10, API_KEY).enqueue(new Callback<NewsArr>() {
             @Override
-            public void onResponse(Call<List<Result>> call, Response<List<Result>> response) {
-                news.addAll(response.body());
+            public void onResponse(Call<NewsArr> call, Response<NewsArr> response) {
+                news.addAll(response.body().getResults());
                 recyclerView.getAdapter().notifyDataSetChanged();
             }
 
             @Override
-            public void onFailure(Call<List<Result>> call, Throwable t) {
+            public void onFailure(Call<NewsArr> call, Throwable t) {
                 Toast.makeText(MainActivity.this, "An error occurred during networking", Toast.LENGTH_SHORT).show();
             }
         });
