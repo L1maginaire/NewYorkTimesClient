@@ -29,10 +29,12 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Result post = news.get(position);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            holder.post.setText(Html.fromHtml(post.getBlogName(), Html.FROM_HTML_MODE_LEGACY));
-        } else {
-            holder.post.setText(Html.fromHtml(post.getBlogName()));
+        if (null != post.getBlogName()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                holder.post.setText(Html.fromHtml(post.getBlogName(), Html.FROM_HTML_MODE_LEGACY));
+            } else {
+                holder.post.setText(Html.fromHtml(post.getBlogName()));
+            }
         }
         holder.site.setText(post.getTitle());
     }
