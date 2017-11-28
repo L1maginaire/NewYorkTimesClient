@@ -45,6 +45,7 @@ public class MainFragment extends Fragment {
     Button b1;
     Button b2;
     private boolean mIsLoading;
+    private int offset=0;
 
     public static MainFragment newInstance() {
         Bundle args = new Bundle();
@@ -95,12 +96,13 @@ public class MainFragment extends Fragment {
                 totalItemCount = mGridLayoutManager.getItemCount();
                 pastVisiblesItems = mGridLayoutManager.findFirstVisibleItemPosition();
                 if (visibleItemCount + pastVisiblesItems >= totalItemCount && !mIsLoading) {
-//                    loadNextPage();
+                f(offset+20);
                 }
             }
         });
         mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             private boolean mProcessed = false;
+
             @Override
             public void onGlobalLayout() {
                 if (mProcessed) {
@@ -117,7 +119,7 @@ public class MainFragment extends Fragment {
                 mProcessed = true;
             }
         });
-        f();
+        f(offset);
         setupAdapter();
         updateItems();
 
@@ -190,8 +192,8 @@ public class MainFragment extends Fragment {
     }
 
 
-    void f() {
-        App.getApi().getDefault(API_KEY).enqueue(new Callback<NewsArr>() {
+    void f(int offset) {
+        App.getApi().getDefault(API_KEY, offset).enqueue(new Callback<NewsArr>() {
             @Override
             public void onResponse(Call<NewsArr> call, Response<NewsArr> response) {
                 news.addAll(response.body().getResults());
