@@ -96,7 +96,8 @@ public class MainFragment extends Fragment {
                 totalItemCount = mGridLayoutManager.getItemCount();
                 pastVisiblesItems = mGridLayoutManager.findFirstVisibleItemPosition();
                 if (visibleItemCount + pastVisiblesItems >= totalItemCount && !mIsLoading) {
-                f(offset+20);
+                    offset+=20;
+                f(offset);
                 }
             }
         });
@@ -192,13 +193,12 @@ public class MainFragment extends Fragment {
     }
 
 
-    void f(int offset) {
-        App.getApi().getDefault(API_KEY, offset).enqueue(new Callback<NewsArr>() {
+        void f(final int offset) {
+        App.getApi().getDefault(20, API_KEY, offset).enqueue(new Callback<NewsArr>() {
             @Override
             public void onResponse(Call<NewsArr> call, Response<NewsArr> response) {
                 news.addAll(response.body().getResults());
-                adapter = new Adapter(news);
-                mRecyclerView.setAdapter(adapter);
+                adapter.notifyItemRangeInserted(offset+20, news.size());
             }
 
             @Override
