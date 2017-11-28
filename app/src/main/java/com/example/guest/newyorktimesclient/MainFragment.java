@@ -1,6 +1,7 @@
 package com.example.guest.newyorktimesclient;
 
 import android.app.Activity;
+import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -23,10 +24,13 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.guest.newyorktimesclient.Model.Result;
 import com.example.guest.newyorktimesclient.Model.NewsArr;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +49,7 @@ public class MainFragment extends Fragment {
     Button b1;
     Button b2;
     private boolean mIsLoading;
-    private int offset=0;
+    private int offset = 0;
 
     public static MainFragment newInstance() {
         Bundle args = new Bundle();
@@ -96,8 +100,8 @@ public class MainFragment extends Fragment {
                 totalItemCount = mGridLayoutManager.getItemCount();
                 pastVisiblesItems = mGridLayoutManager.findFirstVisibleItemPosition();
                 if (visibleItemCount + pastVisiblesItems >= totalItemCount && !mIsLoading) {
-                    offset+=20;
-                f(offset);
+                    offset += 20;
+                    f(offset);
                 }
             }
         });
@@ -193,12 +197,12 @@ public class MainFragment extends Fragment {
     }
 
 
-        void f(final int offset) {
+    void f(final int offset) {
         App.getApi().getDefault(20, API_KEY, offset).enqueue(new Callback<NewsArr>() {
             @Override
             public void onResponse(Call<NewsArr> call, Response<NewsArr> response) {
                 news.addAll(response.body().getResults());
-                adapter.notifyItemRangeInserted(offset+20, news.size());
+                adapter.notifyItemRangeInserted(offset + 20, news.size());
             }
 
             @Override
@@ -207,5 +211,47 @@ public class MainFragment extends Fragment {
                 Toast.makeText(getActivity(), "An error occurred during networking", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
+
+        private List<Result> news;
+
+        public Adapter(List<Result> news) {
+            this.news = news;
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.news_item, parent, false);
+            ViewHolder holder = new ViewHolder(v);
+            return holder;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            Result post = news.get(position);
+            Uri uri = Uri.parse(post.getThumbnailStandard());
+            Picasso.with(getContext()).load(uri).resize(100,100).into(holder.iv);
+            holder.site.setText(post.getTitle());
+        }
+
+        @Override
+        public int getItemCount() {
+            if (news == null)
+                return 0;
+            return news.size();
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder {
+            ImageView iv;
+            TextView site;
+
+            public ViewHolder(View itemView) {
+                super(itemView);
+                iv = (ImageView) itemView.findViewById(R.id.iv);
+                site = (TextView) itemView.findViewById(R.id.postitem_site);
+            }
+        }
     }
 }
