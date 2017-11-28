@@ -7,8 +7,25 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 public interface NYTAPI {
-    int hours = 168;
+
     @GET("svc/news/v3/content/all/all.json")
-    Call<NewsArr> getData(@Query("limit") int count, @Query("api-key") String key);
+    Call<NewsArr> getDefault(@Query("api-key") String key);
+
+    @GET("svc/news/v3/content/all/world.json")
+    Call<NewsArr> getWorld(@Query("api-key") String key);
+
+    @GET("svc/news/v3/content/all/fashion.json")
+    Call<NewsArr> getFashion(@Query("api-key") String key);
+
+    @GET("svc/news/v3/content/all/business.json")
+    Call<NewsArr> getBusiness(@Query("api-key") String key);
+
+    @GET("svc/news/v3/content/all/arts.json")
+    Call<NewsArr> getArts(@Query("api-key") String key);
+
+    @GET("svc/news/v3/content/all/science.json")
+    Call<NewsArr> getScience(@Query("api-key") String key);
+
+
 }
 
