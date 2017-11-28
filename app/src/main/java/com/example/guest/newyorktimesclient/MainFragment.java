@@ -13,6 +13,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,7 +44,7 @@ public class MainFragment extends Fragment {
     private String API_KEY = "0343ec428ded42d19bb3f04b015c2e2b";
     RecyclerView mRecyclerView;
     int pastVisiblesItems, visibleItemCount, totalItemCount;
-    GridLayoutManager mGridLayoutManager;
+    StaggeredGridLayoutManager mGridLayoutManager;
     Adapter adapter;
     List<Result> news;
     Button b1;
@@ -91,14 +92,17 @@ public class MainFragment extends Fragment {
 
         mRecyclerView = (RecyclerView) v
                 .findViewById(R.id.posts_recycle_view);
-        mRecyclerView.setLayoutManager(mGridLayoutManager = new GridLayoutManager
-                (getActivity(), 3));
+        mRecyclerView.setLayoutManager(mGridLayoutManager = new StaggeredGridLayoutManager
+                (3, StaggeredGridLayoutManager.VERTICAL));
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 visibleItemCount = mGridLayoutManager.getChildCount();
                 totalItemCount = mGridLayoutManager.getItemCount();
-                pastVisiblesItems = mGridLayoutManager.findFirstVisibleItemPosition();
+                int[] firstVisibleItems = mGridLayoutManager.findFirstVisibleItemPositions(null);
+                if (firstVisibleItems != null && firstVisibleItems.length > 0) {
+                    pastVisiblesItems = firstVisibleItems[0];
+                }
                 if (visibleItemCount + pastVisiblesItems >= totalItemCount && !mIsLoading) {
                     offset += 20;
                     f(offset);
@@ -232,7 +236,7 @@ public class MainFragment extends Fragment {
         public void onBindViewHolder(ViewHolder holder, int position) {
             Result post = news.get(position);
             Uri uri = Uri.parse(post.getThumbnailStandard());
-            Picasso.with(getContext()).load(uri).resize(100,100).into(holder.iv);
+            Picasso.with(getContext()).load(uri).into(holder.iv); //TODO: pic resize
             holder.site.setText(post.getTitle());
         }
 
