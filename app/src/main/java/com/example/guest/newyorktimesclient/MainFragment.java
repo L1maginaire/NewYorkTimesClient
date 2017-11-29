@@ -3,14 +3,7 @@ package com.example.guest.newyorktimesclient;
 import android.app.Activity;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
-import android.os.Handler;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -24,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,14 +33,18 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainFragment extends Fragment {
-    private String API_KEY = "0343ec428ded42d19bb3f04b015c2e2b";
+    private String API_KEY = "ххх";
     RecyclerView mRecyclerView;
-    int pastVisiblesItems, visibleItemCount, totalItemCount;
+    // The minimum amount of items to have below your current scroll position before loading more.
+    private int visibleThreshold = 5;
+    // The current offset index of data you have loaded
+    private int currentPage = 0;
+    // The total number of items in the dataset after the last load
+    private int previousTotalItemCount = 0;
+    private int startingPageIndex = 0;
     StaggeredGridLayoutManager mGridLayoutManager;
     Adapter adapter;
     List<Result> news;
-    Button b1;
-    Button b2;
     private boolean mIsLoading;
     private int offset = 0;
 
@@ -84,34 +80,64 @@ public class MainFragment extends Fragment {
     }
 
 
+    public int getLastVisibleItem(int[] lastVisibleItemPositions) {
+        int maxSize = 0;
+        for (int i = 0; i < lastVisibleItemPositions.length; i++) {
+            if (i == 0) {
+                maxSize = lastVisibleItemPositions[i];
+            }
+            else if (lastVisibleItemPositions[i] > maxSize) {
+                maxSize = lastVisibleItemPositions[i];
+            }
+        }
+        return maxSize;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_main, container,
                 false);
-
         mRecyclerView = (RecyclerView) v
                 .findViewById(R.id.posts_recycle_view);
-        mRecyclerView.setLayoutManager(mGridLayoutManager = new StaggeredGridLayoutManager
-                (3, StaggeredGridLayoutManager.VERTICAL));
+        mGridLayoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(mGridLayoutManager);
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                visibleItemCount = mGridLayoutManager.getChildCount();
-                totalItemCount = mGridLayoutManager.getItemCount();
-                int[] firstVisibleItems = mGridLayoutManager.findFirstVisibleItemPositions(null);
-                if (firstVisibleItems != null && firstVisibleItems.length > 0) {
-                    pastVisiblesItems = firstVisibleItems[0];
+                visibleThreshold = visibleThreshold * mGridLayoutManager.getSpanCount();
+                int lastVisibleItemPosition = 0;
+                int totalItemCount = mGridLayoutManager.getItemCount();
+                int[] lastVisibleItemPositions = mGridLayoutManager.findLastVisibleItemPositions(null);
+                    lastVisibleItemPosition = getLastVisibleItem(lastVisibleItemPositions);
+                if (totalItemCount < previousTotalItemCount) {
+                    currentPage = startingPageIndex;
+                    previousTotalItemCount = totalItemCount;
+                    if (totalItemCount == 0) {
+                        mIsLoading = true;
+                    }
                 }
-                if (visibleItemCount + pastVisiblesItems >= totalItemCount && !mIsLoading) {
-                    offset += 20;
+                // If it’s still loading, we check to see if the dataset count has
+                // changed, if so we conclude it has finished loading and update the current page
+                // number and total item count.
+                if (mIsLoading && (totalItemCount > previousTotalItemCount)) {
+                    mIsLoading = false;
+                    previousTotalItemCount = totalItemCount;
+                }
+
+                // If it isn’t currently loading, we check to see if we have breached
+                // the visibleThreshold and need to reload more data.
+                // If we do need to reload some more data, we execute onLoadMore to fetch the data.
+                // threshold should reflect how many total columns there are too
+                if (!mIsLoading && (lastVisibleItemPosition + visibleThreshold) > totalItemCount) {
+                    offset+=20;
                     f(offset);
+                    mIsLoading = true;
                 }
             }
         });
         mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             private boolean mProcessed = false;
-
             @Override
             public void onGlobalLayout() {
                 if (mProcessed) {
@@ -206,7 +232,7 @@ public class MainFragment extends Fragment {
             @Override
             public void onResponse(Call<NewsArr> call, Response<NewsArr> response) {
                 news.addAll(response.body().getResults());
-                adapter.notifyItemRangeInserted(offset + 20, news.size());
+                adapter.notifyItemRangeInserted(offset + 20, news.size());//TODO
             }
 
             @Override
