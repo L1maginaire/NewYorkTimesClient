@@ -33,7 +33,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainFragment extends Fragment {
-    private String API_KEY = "ххх";
+    private String API_KEY = "0343ec428ded42d19bb3f04b015c2e2b";
     RecyclerView mRecyclerView;
     // The minimum amount of items to have below your current scroll position before loading more.
     private int visibleThreshold = 5;
@@ -231,8 +231,10 @@ public class MainFragment extends Fragment {
         App.getApi().getDefault(20, API_KEY, offset).enqueue(new Callback<NewsArr>() {
             @Override
             public void onResponse(Call<NewsArr> call, Response<NewsArr> response) {
-                news.addAll(response.body().getResults());
-                adapter.notifyItemRangeInserted(offset + 20, news.size());//TODO
+                if (response.body() != null) {
+                    news.addAll(response.body().getResults());
+                    adapter.notifyItemRangeInserted(offset + 20, news.size());//TODO
+                }
             }
 
             @Override
