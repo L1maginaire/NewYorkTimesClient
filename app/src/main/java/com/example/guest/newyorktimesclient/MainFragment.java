@@ -231,10 +231,10 @@ public class MainFragment extends Fragment {
         App.getApi().getDefault(20, API_KEY, offset).enqueue(new Callback<NewsArr>() {
             @Override
             public void onResponse(Call<NewsArr> call, Response<NewsArr> response) {
-                if (response.body() != null) {
+                if (response.isSuccessful() || response.body() != null) {
                     news.addAll(response.body().getResults());
                     adapter.notifyItemRangeInserted(offset + 20, news.size());//TODO
-                }
+                } else {Log.d("TAG", response.body().getResults().toString());}
             }
 
             @Override
