@@ -6,4 +6,6 @@
     <string name="d">d</string>
     <string name="search">Search</string>
     <string name="clear_search">Clear search</string>
+    <string name="quick_share">Quick share</string>
+    <string name="quick_browser">Quick browser</string>
 </resources>

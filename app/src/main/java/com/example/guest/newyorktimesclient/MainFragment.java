@@ -1,9 +1,13 @@
 package com.example.guest.newyorktimesclient;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -17,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +38,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainFragment extends Fragment {
+    private static final String DIALOG = "dialogfragment";
     private String API_KEY = "0343ec428ded42d19bb3f04b015c2e2b";
     RecyclerView mRecyclerView;
     // The minimum amount of items to have below your current scroll position before loading more.
@@ -47,6 +53,7 @@ public class MainFragment extends Fragment {
     List<Result> news;
     private boolean mIsLoading;
     private int offset = 0;
+    private final Context mContext = getContext();
 
     public static MainFragment newInstance() {
         Bundle args = new Bundle();
@@ -85,8 +92,7 @@ public class MainFragment extends Fragment {
         for (int i = 0; i < lastVisibleItemPositions.length; i++) {
             if (i == 0) {
                 maxSize = lastVisibleItemPositions[i];
-            }
-            else if (lastVisibleItemPositions[i] > maxSize) {
+            } else if (lastVisibleItemPositions[i] > maxSize) {
                 maxSize = lastVisibleItemPositions[i];
             }
         }
@@ -109,7 +115,7 @@ public class MainFragment extends Fragment {
                 int lastVisibleItemPosition = 0;
                 int totalItemCount = mGridLayoutManager.getItemCount();
                 int[] lastVisibleItemPositions = mGridLayoutManager.findLastVisibleItemPositions(null);
-                    lastVisibleItemPosition = getLastVisibleItem(lastVisibleItemPositions);
+                lastVisibleItemPosition = getLastVisibleItem(lastVisibleItemPositions);
                 if (totalItemCount < previousTotalItemCount) {
                     currentPage = startingPageIndex;
                     previousTotalItemCount = totalItemCount;
@@ -130,7 +136,7 @@ public class MainFragment extends Fragment {
                 // If we do need to reload some more data, we execute onLoadMore to fetch the data.
                 // threshold should reflect how many total columns there are too
                 if (!mIsLoading && (lastVisibleItemPosition + visibleThreshold) > totalItemCount) {
-                    offset+=20;
+                    offset += 20;
                     f(offset);
                     mIsLoading = true;
                 }
@@ -138,6 +144,7 @@ public class MainFragment extends Fragment {
         });
         mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             private boolean mProcessed = false;
+
             @Override
             public void onGlobalLayout() {
                 if (mProcessed) {
@@ -226,7 +233,6 @@ public class MainFragment extends Fragment {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-
     void f(final int offset) {
         App.getApi().getDefault(20, API_KEY, offset).enqueue(new Callback<NewsArr>() {
             @Override
@@ -234,7 +240,13 @@ public class MainFragment extends Fragment {
                 if (response.isSuccessful() || response.body() != null) {
                     news.addAll(response.body().getResults());
                     adapter.notifyItemRangeInserted(offset + 20, news.size());//TODO
-                } else {Log.d("TAG", response.body().getResults().toString());}
+                } else {
+                    try {
+                        Log.d("TAG", response.body().getResults().toString());
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
 
             @Override
@@ -244,6 +256,7 @@ public class MainFragment extends Fragment {
             }
         });
     }
+
 
     class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
@@ -262,10 +275,17 @@ public class MainFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            Result post = news.get(position);
-            Uri uri = Uri.parse(post.getThumbnailStandard());
+            final Result post = news.get(position);
+            final Uri uri = Uri.parse(post.getThumbnailStandard());
             Picasso.with(getContext()).load(uri).into(holder.iv); //TODO: pic resize
             holder.site.setText(post.getTitle());
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = BrowserActivity.newIntent(getActivity(), Uri.parse(post.getUrl()));
+                    startActivity(i);
+                }
+            });
         }
 
         @Override
