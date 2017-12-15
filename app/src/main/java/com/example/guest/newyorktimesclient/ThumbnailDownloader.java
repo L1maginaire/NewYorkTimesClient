@@ -1,3 +1,4 @@
+/*
 package com.example.guest.newyorktimesclient;
 
 import android.graphics.Bitmap;
@@ -99,3 +100,4 @@ public class ThumbnailDownloader<T> extends HandlerThread {
         }
     }
 }
+*/

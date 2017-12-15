@@ -5,10 +5,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,7 +15,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -42,7 +40,7 @@ public class MainFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private int visibleThreshold = 5;
     private int previousTotalItemCount = 0;
-    private StaggeredGridLayoutManager mGridLayoutManager;
+    private LinearLayoutManager linearLayoutManager;
     private Adapter adapter;
     private List<Result> news;
     private boolean mIsLoading;
@@ -83,15 +81,15 @@ public class MainFragment extends Fragment {
                 false);
         mRecyclerView = (RecyclerView) v
                 .findViewById(R.id.posts_recycle_view);
-        mGridLayoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
-        mRecyclerView.setLayoutManager(mGridLayoutManager);
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        linearLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+        /*mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                visibleThreshold = visibleThreshold * mGridLayoutManager.getSpanCount();
+                visibleThreshold = visibleThreshold * linearLayoutManager.getSpanCount();
                 int lastVisibleItemPosition = 0;
-                int totalItemCount = mGridLayoutManager.getItemCount();
-                int[] lastVisibleItemPositions = mGridLayoutManager.findLastVisibleItemPositions(null);
+                int totalItemCount = linearLayoutManager.getItemCount();
+                int[] lastVisibleItemPositions = linearLayoutManager.findLastVisibleItemPositions(null);
                 lastVisibleItemPosition = getLastVisibleItem(lastVisibleItemPositions);
                 if (totalItemCount < previousTotalItemCount) {
                     previousTotalItemCount = totalItemCount;
@@ -109,8 +107,14 @@ public class MainFragment extends Fragment {
                     mIsLoading = true;
                 }
             }
+        });*/
+        mRecyclerView.addOnScrollListener(new EndlessScrollImplementation(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int offset) {
+                fetch(offset);
+            }
         });
-        mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        /*mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             private boolean mProcessed = false;
 
             @Override
@@ -124,11 +128,11 @@ public class MainFragment extends Fragment {
                 int dpWidth = Math.round(width / (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
                 final int COLUMN_MIN_SIZE = 75;
                 int columns = dpWidth / COLUMN_MIN_SIZE;
-                mGridLayoutManager.setSpanCount(columns);
+                linearLayoutManager.setSpanCount(columns);
 
                 mProcessed = true;
             }
-        });
+        });*/
         fetch(offset);
         setupAdapter();
         updateItems();
@@ -280,8 +284,11 @@ public class MainFragment extends Fragment {
             public void onBindViewHolder(ViewHolder holder, int position) {
                 final Result post = news.get(position);
                 final Uri uri = Uri.parse(post.getThumbnailStandard());
-                Picasso.with(getContext()).load(uri).resize(75,75).into(holder.iv); //TODO: pic resize
-                holder.site.setText(post.getTitle());
+                Picasso.with(getContext()).load(uri).resize(75,75).into(holder.imageView);
+                holder.title.setText(post.getTitle());
+                holder.summary.setText(post.getAbstract());
+                String s = post.getPublishedDate().substring(0, 10);
+                holder.published.setText(s);
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -299,13 +306,17 @@ public class MainFragment extends Fragment {
             }
 
             class ViewHolder extends RecyclerView.ViewHolder {
-                ImageView iv;
-                TextView site;
+                ImageView imageView;
+                TextView title;
+                TextView summary;
+                TextView published;
 
                 public ViewHolder(View itemView) {
                     super(itemView);
-                    iv = (ImageView) itemView.findViewById(R.id.iv);
-                    site = (TextView) itemView.findViewById(R.id.postitem_site);
+                    imageView = (ImageView) itemView.findViewById(R.id.urlToImage);
+                    title = (TextView) itemView.findViewById(R.id.news_title);
+                    summary = (TextView) itemView.findViewById(R.id.news_summary);
+                    published = (TextView) itemView.findViewById(R.id.publishedAt);
                 }
             }
         }
