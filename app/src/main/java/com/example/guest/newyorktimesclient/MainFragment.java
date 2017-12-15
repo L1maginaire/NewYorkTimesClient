@@ -38,12 +38,9 @@ public class MainFragment extends Fragment {
     private static final String TAG = MainFragment.class.getSimpleName();
     private String API_KEY = "0343ec428ded42d19bb3f04b015c2e2b";
     private RecyclerView mRecyclerView;
-    private int visibleThreshold = 5;
-    private int previousTotalItemCount = 0;
     private LinearLayoutManager linearLayoutManager;
     private Adapter adapter;
     private List<Result> news;
-    private boolean mIsLoading;
     private int offset = 0;
 
     public static MainFragment newInstance() {
@@ -61,19 +58,6 @@ public class MainFragment extends Fragment {
         news = new ArrayList<>();
     }
 
-
-    public int getLastVisibleItem(int[] lastVisibleItemPositions) {
-        int maxSize = 0;
-        for (int i = 0; i < lastVisibleItemPositions.length; i++) {
-            if (i == 0) {
-                maxSize = lastVisibleItemPositions[i];
-            } else if (lastVisibleItemPositions[i] > maxSize) {
-                maxSize = lastVisibleItemPositions[i];
-            }
-        }
-        return maxSize;
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
@@ -83,56 +67,12 @@ public class MainFragment extends Fragment {
                 .findViewById(R.id.posts_recycle_view);
         linearLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        /*mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                visibleThreshold = visibleThreshold * linearLayoutManager.getSpanCount();
-                int lastVisibleItemPosition = 0;
-                int totalItemCount = linearLayoutManager.getItemCount();
-                int[] lastVisibleItemPositions = linearLayoutManager.findLastVisibleItemPositions(null);
-                lastVisibleItemPosition = getLastVisibleItem(lastVisibleItemPositions);
-                if (totalItemCount < previousTotalItemCount) {
-                    previousTotalItemCount = totalItemCount;
-                    if (totalItemCount == 0) {
-                        mIsLoading = true;
-                    }
-                }
-                if (mIsLoading && (totalItemCount > previousTotalItemCount)) {
-                    mIsLoading = false;
-                    previousTotalItemCount = totalItemCount;
-                }
-                if (!mIsLoading && (lastVisibleItemPosition + visibleThreshold) > totalItemCount) {
-                    offset += 20;
-                    fetch(offset);
-                    mIsLoading = true;
-                }
-            }
-        });*/
         mRecyclerView.addOnScrollListener(new EndlessScrollImplementation(linearLayoutManager) {
             @Override
             public void onLoadMore(int offset) {
                 fetch(offset);
             }
         });
-        /*mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            private boolean mProcessed = false;
-
-            @Override
-            public void onGlobalLayout() {
-                if (mProcessed) {
-                    return;
-                }
-
-                int width = mRecyclerView.getWidth();
-                DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-                int dpWidth = Math.round(width / (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
-                final int COLUMN_MIN_SIZE = 75;
-                int columns = dpWidth / COLUMN_MIN_SIZE;
-                linearLayoutManager.setSpanCount(columns);
-
-                mProcessed = true;
-            }
-        });*/
         fetch(offset);
         setupAdapter();
         updateItems();
