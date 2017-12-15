@@ -23,6 +23,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.guest.newyorktimesclient.Model.QueryModel.Doc;
+import com.example.guest.newyorktimesclient.Model.QueryModel.Multimedium;
+import com.example.guest.newyorktimesclient.Model.QueryModel.QueryArr;
 import com.example.guest.newyorktimesclient.Model.Result;
 import com.example.guest.newyorktimesclient.Model.NewsArr;
 import com.squareup.picasso.Picasso;
@@ -145,131 +148,164 @@ public class MainFragment extends Fragment {
                     @Override
                     public boolean onQueryTextSubmit(String s) {
                         Log.d(TAG, "QueryTextSubmit: " + s);
-                        QueryPreferences.setStoredQuery(getActivity(), s);
-                        hideKeyboard(getActivity());
-                        updateItems();
+                        App.getApi().getQuery("USSR", 2, API_KEY).enqueue(new Callback<QueryArr>() {
+                            @Override
+                            public void onResponse(Call<QueryArr> call, Response<QueryArr> response) {
+                                if (response.isSuccessful() || response.body() != null) {
+                                    news = new ArrayList<>();
+                                    com.example.guest.newyorktimesclient.Model.QueryModel.Response resp = response.body().getResponse();
+                                    List<Doc> docs = resp.getDocs();
+                                    for (Doc d:docs) {
+                                        Result r = new Result();
+                                        Multimedium m = d.getMultimedia().get(1);
+                                        String s = "https:\\/\\/static01.nyt.com\\/" + m.getUrl();
+                                        r.setThumbnailStandard(s);
+                                        s = d.getSnippet();
+                                        r.setTitle(s);
+                                        news.add(r);
+                                    }
+                                    setupAdapter();
+//                                    adapter.notifyItemRangeInserted(offset + 10/*?*/, news.size());
+                                } else {
+                                    try {
+                                        Log.d(TAG, response.body().getCopyright());
+                                    } catch (NullPointerException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<QueryArr> call, Throwable t) {
+                                t.printStackTrace();
+                                Toast.makeText(getActivity(), "An error occurred during networking", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                         return true;
                     }
 
-                    @Override
-                    public boolean onQueryTextChange(String s) {
-                        Log.d(TAG, "QueryTextChange: " + s);
-                        return false;
+                        @Override
+                        public boolean onQueryTextChange (String s){
+                            Log.d(TAG, "QueryTextChange: " + s);
+                            return false;
+                        }
+                    });
+
+        searchView.setOnSearchClickListener(new View.OnClickListener()
+
+                    {
+                        @Override
+                        public void onClick (View v){
+                        String query = QueryPreferences.getStoredQuery(getActivity());
+                        searchView.setQuery(query, false);
                     }
-                });
-        searchView.setOnSearchClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String query = QueryPreferences.getStoredQuery(getActivity());
-                searchView.setQuery(query, false);
+                    });
+                }
+
+        @Override
+        public boolean onOptionsItemSelected (MenuItem item){
+            switch (item.getItemId()) {
+                case R.id.menu_item_clear:
+                    QueryPreferences.setStoredQuery(getActivity(), null);
+                    updateItems();
+                    return true;
+                default:
+                    return super.onOptionsItemSelected(item);
             }
-        });
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_item_clear:
-                QueryPreferences.setStoredQuery(getActivity(), null);
-                updateItems();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
         }
-    }
 
-    private void setupAdapter() {
-        if (isAdded()) {
-            adapter = new Adapter(news);
-            mRecyclerView.setAdapter(adapter);
+        private void setupAdapter () {
+            if (isAdded()) {
+                adapter = new Adapter(news);
+                mRecyclerView.setAdapter(adapter);
+            }
         }
-    }
 
-    private void updateItems() {
-        String query = QueryPreferences.getStoredQuery(getActivity());
+        private void updateItems () {
+            String query = QueryPreferences.getStoredQuery(getActivity());
 //        new Fetcher(query).execute();
-    }
-
-    public static void hideKeyboard(Activity activity) {
-        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        View view = activity.getCurrentFocus();
-        if (view == null) {
-            view = new View(activity);
         }
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
 
-    void fetch(final int offset) {
-        App.getApi().getDefault(20, API_KEY, offset).enqueue(new Callback<NewsArr>() {
-            @Override
-            public void onResponse(Call<NewsArr> call, Response<NewsArr> response) {
-                if (response.isSuccessful() || response.body() != null) {
-                    news.addAll(response.body().getResults());
-                    adapter.notifyItemRangeInserted(offset + 20, news.size());
-                } else {
-                    try {
-                        Log.d(TAG, response.body().getResults().toString());
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
+        public static void hideKeyboard (Activity activity){
+            InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+            View view = activity.getCurrentFocus();
+            if (view == null) {
+                view = new View(activity);
+            }
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+
+        void fetch ( final int offset){
+            App.getApi().getDefault(20, API_KEY, offset).enqueue(new Callback<NewsArr>() {
+                @Override
+                public void onResponse(Call<NewsArr> call, Response<NewsArr> response) {
+                    if (response.isSuccessful() || response.body() != null) {
+                        news.addAll(response.body().getResults());
+                        adapter.notifyItemRangeInserted(offset + 20, news.size());
+                    } else {
+                        try {
+                            Log.d(TAG, response.body().getResults().toString());
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<NewsArr> call, Throwable t) {
-                t.printStackTrace();
-                Toast.makeText(getActivity(), "An error occurred during networking", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-
-    class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
-
-        private List<Result> news;
-
-        public Adapter(List<Result> news) {
-            this.news = news;
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.news_item, parent, false);
-            ViewHolder holder = new ViewHolder(v);
-            return holder;
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            final Result post = news.get(position);
-            final Uri uri = Uri.parse(post.getThumbnailStandard());
-            Picasso.with(getContext()).load(uri).resize(75, 75).into(holder.iv); //TODO: pic resize
-            holder.site.setText(post.getTitle());
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
-                    Intent i = BrowserActivity.newIntent(getActivity(), Uri.parse(post.getUrl()));
-                    startActivity(i);
+                public void onFailure(Call<NewsArr> call, Throwable t) {
+                    t.printStackTrace();
+                    Toast.makeText(getActivity(), "An error occurred during networking", Toast.LENGTH_SHORT).show();
                 }
             });
         }
 
-        @Override
-        public int getItemCount() {
-            if (news == null)
-                return 0;
-            return news.size();
-        }
 
-        class ViewHolder extends RecyclerView.ViewHolder {
-            ImageView iv;
-            TextView site;
+        class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
-            public ViewHolder(View itemView) {
-                super(itemView);
-                iv = (ImageView) itemView.findViewById(R.id.iv);
-                site = (TextView) itemView.findViewById(R.id.postitem_site);
+            private List<Result> news;
+
+            public Adapter(List<Result> news) {
+                this.news = news;
+            }
+
+            @Override
+            public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.news_item, parent, false);
+                ViewHolder holder = new ViewHolder(v);
+                return holder;
+            }
+
+            @Override
+            public void onBindViewHolder(ViewHolder holder, int position) {
+                final Result post = news.get(position);
+                final Uri uri = Uri.parse(post.getThumbnailStandard());
+                Picasso.with(getContext()).load(uri).resize(75, 75).into(holder.iv); //TODO: pic resize
+                holder.site.setText(post.getTitle());
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent i = BrowserActivity.newIntent(getActivity(), Uri.parse(post.getUrl()));
+                        startActivity(i);
+                    }
+                });
+            }
+
+            @Override
+            public int getItemCount() {
+                if (news == null)
+                    return 0;
+                return news.size();
+            }
+
+            class ViewHolder extends RecyclerView.ViewHolder {
+                ImageView iv;
+                TextView site;
+
+                public ViewHolder(View itemView) {
+                    super(itemView);
+                    iv = (ImageView) itemView.findViewById(R.id.iv);
+                    site = (TextView) itemView.findViewById(R.id.postitem_site);
+                }
             }
         }
     }
-}
