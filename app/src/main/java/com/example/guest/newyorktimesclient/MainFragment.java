@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -21,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -137,7 +134,7 @@ public class MainFragment extends Fragment {
                 // threshold should reflect how many total columns there are too
                 if (!mIsLoading && (lastVisibleItemPosition + visibleThreshold) > totalItemCount) {
                     offset += 20;
-                    f(offset);
+                    fetch(offset);
                     mIsLoading = true;
                 }
             }
@@ -154,14 +151,14 @@ public class MainFragment extends Fragment {
                 int width = mRecyclerView.getWidth();
                 DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
                 int dpWidth = Math.round(width / (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
-                final int COLUMN_MIN_SIZE = 120;
+                final int COLUMN_MIN_SIZE = 75;
                 int columns = dpWidth / COLUMN_MIN_SIZE;
                 mGridLayoutManager.setSpanCount(columns);
 
                 mProcessed = true;
             }
         });
-        f(offset);
+        fetch(offset);
         setupAdapter();
         updateItems();
 
@@ -233,7 +230,7 @@ public class MainFragment extends Fragment {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    void f(final int offset) {
+    void fetch(final int offset) {
         App.getApi().getDefault(20, API_KEY, offset).enqueue(new Callback<NewsArr>() {
             @Override
             public void onResponse(Call<NewsArr> call, Response<NewsArr> response) {
@@ -277,7 +274,7 @@ public class MainFragment extends Fragment {
         public void onBindViewHolder(ViewHolder holder, int position) {
             final Result post = news.get(position);
             final Uri uri = Uri.parse(post.getThumbnailStandard());
-            Picasso.with(getContext()).load(uri).into(holder.iv); //TODO: pic resize
+            Picasso.with(getContext()).load(uri).resize(75, 75).into(holder.iv); //TODO: pic resize
             holder.site.setText(post.getTitle());
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
