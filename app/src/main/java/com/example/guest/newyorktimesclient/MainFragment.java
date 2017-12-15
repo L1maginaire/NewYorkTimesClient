@@ -1,7 +1,6 @@
 package com.example.guest.newyorktimesclient;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
@@ -158,7 +157,7 @@ public class MainFragment extends Fragment {
                                     for (Doc d:docs) {
                                         Result r = new Result();
                                         Multimedium m = d.getMultimedia().get(1);
-                                        String s = "https:\\/\\/static01.nyt.com\\/" + m.getUrl();
+                                        String s = "https://static01.nyt.com/" + m.getUrl();
                                         r.setThumbnailStandard(s);
                                         s = d.getSnippet();
                                         r.setTitle(s);
@@ -279,7 +278,7 @@ public class MainFragment extends Fragment {
             public void onBindViewHolder(ViewHolder holder, int position) {
                 final Result post = news.get(position);
                 final Uri uri = Uri.parse(post.getThumbnailStandard());
-                Picasso.with(getContext()).load(uri).resize(75, 75).into(holder.iv); //TODO: pic resize
+                Picasso.with(getContext()).load(uri).into(holder.iv); //TODO: pic resize
                 holder.site.setText(post.getTitle());
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
