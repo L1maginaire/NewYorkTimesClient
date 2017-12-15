@@ -22,11 +22,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.guest.newyorktimesclient.Model.LatestModel.NewsArr;
 import com.example.guest.newyorktimesclient.Model.QueryModel.Doc;
 import com.example.guest.newyorktimesclient.Model.QueryModel.Multimedium;
 import com.example.guest.newyorktimesclient.Model.QueryModel.QueryArr;
-import com.example.guest.newyorktimesclient.Model.Result;
-import com.example.guest.newyorktimesclient.Model.NewsArr;
+import com.example.guest.newyorktimesclient.Model.LatestModel.Result;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -140,7 +140,7 @@ public class MainFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
         super.onCreateOptionsMenu(menu, menuInflater);
         menuInflater.inflate(R.menu.main_fragment, menu);
-        MenuItem searchItem = menu.findItem(R.id.menu_item_search);
+        final MenuItem searchItem = menu.findItem(R.id.menu_item_search);
         final SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener
                 (new SearchView.OnQueryTextListener() {
@@ -161,10 +161,11 @@ public class MainFragment extends Fragment {
                                         r.setThumbnailStandard(s);
                                         s = d.getSnippet();
                                         r.setTitle(s);
+                                        s = d.getWebUrl();
+                                        r.setUrl(s);
                                         news.add(r);
                                     }
                                     setupAdapter();
-//                                    adapter.notifyItemRangeInserted(offset + 10/*?*/, news.size());
                                 } else {
                                     try {
                                         Log.d(TAG, response.body().getCopyright());
@@ -180,6 +181,7 @@ public class MainFragment extends Fragment {
                                 Toast.makeText(getActivity(), "An error occurred during networking", Toast.LENGTH_SHORT).show();
                             }
                         });
+                        searchView.clearFocus();//TODO: backbutton&adapter
                         return true;
                     }
 
