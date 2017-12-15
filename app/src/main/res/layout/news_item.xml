@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:padding="5dp"
+    android:padding="8dp"
     android:gravity="center"
-    android:layout_width="match_parent"
+    android:layout_width="75dp"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <ImageView
         android:id="@+id/iv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"/>
 
     <TextView
         android:id="@+id/postitem_site"
-        android:layout_width="match_parent"
+        android:padding="8dp"
+        android:layout_width="75dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal" />
 </LinearLayout>

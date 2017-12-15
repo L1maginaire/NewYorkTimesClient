@@ -280,7 +280,7 @@ public class MainFragment extends Fragment {
             public void onBindViewHolder(ViewHolder holder, int position) {
                 final Result post = news.get(position);
                 final Uri uri = Uri.parse(post.getThumbnailStandard());
-                Picasso.with(getContext()).load(uri).into(holder.iv); //TODO: pic resize
+                Picasso.with(getContext()).load(uri).resize(75,75).into(holder.iv); //TODO: pic resize
                 holder.site.setText(post.getTitle());
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
