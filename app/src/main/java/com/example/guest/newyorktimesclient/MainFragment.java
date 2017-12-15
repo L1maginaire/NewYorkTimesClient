@@ -35,22 +35,16 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainFragment extends Fragment {
-    private static final String DIALOG = "dialogfragment";
+    private static final String TAG = MainFragment.class.getSimpleName();
     private String API_KEY = "0343ec428ded42d19bb3f04b015c2e2b";
-    RecyclerView mRecyclerView;
-    // The minimum amount of items to have below your current scroll position before loading more.
+    private RecyclerView mRecyclerView;
     private int visibleThreshold = 5;
-    // The current offset index of data you have loaded
-    private int currentPage = 0;
-    // The total number of items in the dataset after the last load
     private int previousTotalItemCount = 0;
-    private int startingPageIndex = 0;
-    StaggeredGridLayoutManager mGridLayoutManager;
-    Adapter adapter;
-    List<Result> news;
+    private StaggeredGridLayoutManager mGridLayoutManager;
+    private Adapter adapter;
+    private List<Result> news;
     private boolean mIsLoading;
     private int offset = 0;
-    private final Context mContext = getContext();
 
     public static MainFragment newInstance() {
         Bundle args = new Bundle();
@@ -65,22 +59,6 @@ public class MainFragment extends Fragment {
         setRetainInstance(true);
         setHasOptionsMenu(true);
         news = new ArrayList<>();
-//        Handler responseHandler = new Handler();
-//        mThumbnailDownloader = new ThumbnailDownloader<>(responseHandler);
-//        mThumbnailDownloader.setThumbnailDownloadListener(
-//                new ThumbnailDownloader.ThumbnailDownloadListener<PhotoHolder>() {
-//                    @Override
-//                    public void onThumbnailDownloaded(PhotoHolder photoHolder,
-//                                                      Bitmap bitmap) {
-//                        Drawable drawable = new BitmapDrawable(getResources(),
-//                                bitmap);
-//                        photoHolder.bindDrawable(drawable);
-//                    }
-//                }
-//        );
-//        mThumbnailDownloader.start();
-//        mThumbnailDownloader.getLooper();
-//        Log.i("TAG", "Background thread started");
     }
 
 
@@ -114,24 +92,15 @@ public class MainFragment extends Fragment {
                 int[] lastVisibleItemPositions = mGridLayoutManager.findLastVisibleItemPositions(null);
                 lastVisibleItemPosition = getLastVisibleItem(lastVisibleItemPositions);
                 if (totalItemCount < previousTotalItemCount) {
-                    currentPage = startingPageIndex;
                     previousTotalItemCount = totalItemCount;
                     if (totalItemCount == 0) {
                         mIsLoading = true;
                     }
                 }
-                // If it’s still loading, we check to see if the dataset count has
-                // changed, if so we conclude it has finished loading and update the current page
-                // number and total item count.
                 if (mIsLoading && (totalItemCount > previousTotalItemCount)) {
                     mIsLoading = false;
                     previousTotalItemCount = totalItemCount;
                 }
-
-                // If it isn’t currently loading, we check to see if we have breached
-                // the visibleThreshold and need to reload more data.
-                // If we do need to reload some more data, we execute onLoadMore to fetch the data.
-                // threshold should reflect how many total columns there are too
                 if (!mIsLoading && (lastVisibleItemPosition + visibleThreshold) > totalItemCount) {
                     offset += 20;
                     fetch(offset);
@@ -175,7 +144,7 @@ public class MainFragment extends Fragment {
                 (new SearchView.OnQueryTextListener() {
                     @Override
                     public boolean onQueryTextSubmit(String s) {
-                        Log.d("TAG", "QueryTextSubmit: " + s);
+                        Log.d(TAG, "QueryTextSubmit: " + s);
                         QueryPreferences.setStoredQuery(getActivity(), s);
                         hideKeyboard(getActivity());
                         updateItems();
@@ -184,7 +153,7 @@ public class MainFragment extends Fragment {
 
                     @Override
                     public boolean onQueryTextChange(String s) {
-                        Log.d("TAG", "QueryTextChange: " + s);
+                        Log.d(TAG, "QueryTextChange: " + s);
                         return false;
                     }
                 });
@@ -236,10 +205,10 @@ public class MainFragment extends Fragment {
             public void onResponse(Call<NewsArr> call, Response<NewsArr> response) {
                 if (response.isSuccessful() || response.body() != null) {
                     news.addAll(response.body().getResults());
-                    adapter.notifyItemRangeInserted(offset + 20, news.size());//TODO
+                    adapter.notifyItemRangeInserted(offset + 20, news.size());
                 } else {
                     try {
-                        Log.d("TAG", response.body().getResults().toString());
+                        Log.d(TAG, response.body().getResults().toString());
                     } catch (NullPointerException e) {
                         e.printStackTrace();
                     }
