@@ -225,7 +225,7 @@ public class MainFragment extends Fragment {
                 final Result post = news.get(position);
                 final Uri uri = Uri.parse(post.getThumbnailStandard());
                 Picasso.with(getContext()).load(uri).resize(75,75).into(holder.imageView);
-                holder.title.setText(post.getTitle());
+                holder.title.setText(post.getTitle());//TODO проверка на нули
                 holder.summary.setText(post.getAbstract());
                 String s = post.getPublishedDate().substring(0, 10);
                 holder.published.setText(s);
