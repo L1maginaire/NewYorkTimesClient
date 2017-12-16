@@ -87,13 +87,24 @@ public class MainFragment extends Fragment {
         menuInflater.inflate(R.menu.main_fragment, menu);
         final MenuItem searchItem = menu.findItem(R.id.menu_item_search);
         final SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                searchView.clearFocus();
+                news = new ArrayList<>();
+                fetch(0);
+                setupAdapter();
+                return true;
+            }
+        });
         searchView.setOnQueryTextListener
                 (new SearchView.OnQueryTextListener() {
                     @Override
                     public boolean onQueryTextSubmit(String s) {
                         Log.d(TAG, "QueryTextSubmit: " + s);
+                        searchView.clearFocus();
                         QueryPreferences.setStoredQuery(getActivity(), s);
-                        App.getApi().getQuery("USSR", 2, API_KEY).enqueue(new Callback<QueryArr>() {
+                        App.getApi().getQuery(s, 1, API_KEY).enqueue(new Callback<QueryArr>() {
                             @Override
                             public void onResponse(Call<QueryArr> call, Response<QueryArr> response) {
                                 if (response.isSuccessful() || response.body() != null) {
@@ -101,21 +112,33 @@ public class MainFragment extends Fragment {
                                     com.example.guest.newyorktimesclient.Model.QueryModel.Response resp = response.body().getResponse();
                                     List<Doc> docs = resp.getDocs();
                                     for (Doc d : docs) {
+                                        if (d == null)
+                                            continue;
+                                        List<Multimedium> l = d.getMultimedia();
+                                        if (l == null || l.size() == 0)
+                                            continue;
+                                        Multimedium m = d.getMultimedia().get(0);
                                         Result r = new Result();
-                                        Multimedium m = d.getMultimedia().get(1);
-                                        String picUrl = "https://static01.nyt.com/" + m.getUrl();
-                                        r.setThumbnailStandard(picUrl);
+                                        String picUrl = m.getUrl();
+                                        if (picUrl == null || picUrl.isEmpty())
+                                            continue;
+                                        r.setThumbnailStandard("https://static01.nyt.com/" + picUrl);
                                         String snippet = d.getSnippet();
+                                        if (snippet == null || snippet.isEmpty())
+                                            continue;
                                         r.setAbstract(snippet);
                                         String printHeadline = d.getHeadline().getPrintHeadline();
+                                        if (printHeadline == null || printHeadline.isEmpty())
+                                            continue;
                                         r.setTitle(printHeadline);
                                         String url = d.getWebUrl();
-                                        String date = d.getPubDate();
-                                        r.setPublishedDate(date);
-                                        r.setUrl(url);
-                                        if (picUrl == null || picUrl.isEmpty() || snippet.isEmpty() || snippet == null || url == null || url.isEmpty() || printHeadline == null
-                                                || printHeadline.isEmpty() || date == null || date.isEmpty())
+                                        if (url == null || url.isEmpty())
                                             continue;
+                                        r.setUrl(url);
+                                        String date = d.getPubDate();
+                                        if (date == null || date.isEmpty())
+                                            continue;
+                                        r.setPublishedDate(date);
                                         news.add(r);
                                     }
                                     adapter = new Adapter(news);
@@ -135,7 +158,6 @@ public class MainFragment extends Fragment {
                                 Toast.makeText(getActivity(), "An error occurred during networking", Toast.LENGTH_SHORT).show();
                             }
                         });
-//                        searchView.clearFocus();//TODO: backbutton&adapter
                         return true;
                     }
 
@@ -157,18 +179,6 @@ public class MainFragment extends Fragment {
         });
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_item_clear:
-                QueryPreferences.setStoredQuery(getActivity(), null);
-                updateItems();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
     private void setupAdapter() {
         if (isAdded()) {
             adapter = new Adapter(news);
@@ -178,16 +188,6 @@ public class MainFragment extends Fragment {
 
     private void updateItems() {
         String query = QueryPreferences.getStoredQuery(getActivity());
-//        new Fetcher(query).execute();
-    }
-
-    public static void hideKeyboard(Activity activity) {
-        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        View view = activity.getCurrentFocus();
-        if (view == null) {
-            view = new View(activity);
-        }
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     void fetch(final int offset) {
@@ -196,6 +196,7 @@ public class MainFragment extends Fragment {
             public void onResponse(Call<NewsArr> call, Response<NewsArr> response) {
                 if (response.isSuccessful() || response.body() != null) {
                     List<Result> callbackArr = response.body().getResults();
+                    int counter = 0;
                     for (int i = 0; i < callbackArr.size(); i++) {
                         Result r = callbackArr.get(i);
                         String summary = r.getAbstract();
@@ -205,8 +206,9 @@ public class MainFragment extends Fragment {
                         if (r == null || summary.isEmpty() || title.isEmpty() || pic.isEmpty() || url.isEmpty())
                             continue;
                         news.add(r);
+                        counter++;
                     }
-                    adapter.notifyItemRangeInserted(offset + 20/*todo: проверка на нули и изменения числа*/, news.size());
+                    adapter.notifyItemRangeInserted(offset + counter/*todo: проверка на нули и изменения числа*/, news.size());
                 } else {
                     try {
                         Log.d(TAG, response.body().getResults().toString());
