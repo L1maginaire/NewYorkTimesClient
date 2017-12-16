@@ -92,6 +92,7 @@ public class MainFragment extends Fragment {
                     @Override
                     public boolean onQueryTextSubmit(String s) {
                         Log.d(TAG, "QueryTextSubmit: " + s);
+                        QueryPreferences.setStoredQuery(getActivity(), s);
                         App.getApi().getQuery("USSR", 2, API_KEY).enqueue(new Callback<QueryArr>() {
                             @Override
                             public void onResponse(Call<QueryArr> call, Response<QueryArr> response) {
@@ -105,14 +106,20 @@ public class MainFragment extends Fragment {
                                         String picUrl = "https://static01.nyt.com/" + m.getUrl();
                                         r.setThumbnailStandard(picUrl);
                                         String snippet = d.getSnippet();
-                                        r.setTitle(snippet);
+                                        r.setAbstract(snippet);
+                                        String printHeadline = d.getHeadline().getPrintHeadline();
+                                        r.setTitle(printHeadline);
                                         String url = d.getWebUrl();
+                                        String date = d.getPubDate();
+                                        r.setPublishedDate(date);
                                         r.setUrl(url);
-                                        if (picUrl == null || picUrl == "" || snippet == null || snippet == "" || url == null || url == "")
+                                        if (picUrl == null || picUrl.isEmpty() || snippet.isEmpty() || snippet == null || url == null || url.isEmpty() || printHeadline == null
+                                                || printHeadline.isEmpty() || date == null || date.isEmpty())
                                             continue;
                                         news.add(r);
                                     }
-                                    setupAdapter();
+                                    adapter = new Adapter(news);
+                                    mRecyclerView.setAdapter(adapter);
                                 } else {
                                     try {
                                         Log.d(TAG, response.body().getCopyright());
@@ -128,7 +135,7 @@ public class MainFragment extends Fragment {
                                 Toast.makeText(getActivity(), "An error occurred during networking", Toast.LENGTH_SHORT).show();
                             }
                         });
-                        searchView.clearFocus();//TODO: backbutton&adapter
+//                        searchView.clearFocus();//TODO: backbutton&adapter
                         return true;
                     }
 
@@ -194,7 +201,8 @@ public class MainFragment extends Fragment {
                         String summary = r.getAbstract();
                         String title = r.getTitle();
                         String pic = r.getThumbnailStandard();
-                        if (r == null || summary.isEmpty() || title.isEmpty() || pic.isEmpty())
+                        String url = r.getUrl();
+                        if (r == null || summary.isEmpty() || title.isEmpty() || pic.isEmpty() || url.isEmpty())
                             continue;
                         news.add(r);
                     }
