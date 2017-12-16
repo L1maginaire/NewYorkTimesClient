@@ -28,6 +28,7 @@ import com.example.guest.newyorktimesclient.Model.LatestModel.Result;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -107,7 +108,7 @@ public class MainFragment extends Fragment {
                                         r.setTitle(snippet);
                                         String url = d.getWebUrl();
                                         r.setUrl(url);
-                                        if(picUrl == null || picUrl == "" || snippet == null || snippet == "" || url == null || url == "")
+                                        if (picUrl == null || picUrl == "" || snippet == null || snippet == "" || url == null || url == "")
                                             continue;
                                         news.add(r);
                                     }
@@ -187,8 +188,17 @@ public class MainFragment extends Fragment {
             @Override
             public void onResponse(Call<NewsArr> call, Response<NewsArr> response) {
                 if (response.isSuccessful() || response.body() != null) {
-                    news.addAll(response.body().getResults());
-                    adapter.notifyItemRangeInserted(offset + 20, news.size());
+                    List<Result> callbackArr = response.body().getResults();
+                    for (int i = 0; i < callbackArr.size(); i++) {
+                        Result r = callbackArr.get(i);
+                        String summary = r.getAbstract();
+                        String title = r.getTitle();
+                        String pic = r.getThumbnailStandard();
+                        if (r == null || summary.isEmpty() || title.isEmpty() || pic.isEmpty())
+                            continue;
+                        news.add(r);
+                    }
+                    adapter.notifyItemRangeInserted(offset + 20/*todo: проверка на нули и изменения числа*/, news.size());
                 } else {
                     try {
                         Log.d(TAG, response.body().getResults().toString());
@@ -225,13 +235,10 @@ public class MainFragment extends Fragment {
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             final Result post = news.get(position);
-            final Uri uri = Uri.parse(post.getThumbnailStandard());
+            String imgUrl = post.getThumbnailStandard();
+            final Uri uri = Uri.parse(imgUrl);
             Picasso.with(getContext()).load(uri).resize(75, 75).into(holder.imageView);
-            if(post.getTitle()==null || post.getTitle() == "")
-                return;
             holder.title.setText(post.getTitle());
-            if(post.getAbstract()==null || post.getAbstract() == "")
-                return;
             holder.summary.setText(post.getAbstract());
             String s = post.getPublishedDate().substring(0, 10);
             holder.published.setText(s);
