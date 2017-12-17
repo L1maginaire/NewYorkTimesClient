@@ -14,9 +14,8 @@ public interface NYTAPI {
 
     @GET("svc/search/v2/articlesearch.json")
     Call<QueryArr> getQuery(@Query("q") String query, @Query("page") int offset, @Query("api-key") String key);
-//http://api.nytimes.com/svc/search/v2/articlesearch.json?q=ussr&page=1&api-key=0343ec428ded42d19bb3f04b015c2e2b
-//    @GET("svc/search/v2/articlesearch.json")
-//    Call<NewsArr> getQuery(@Query("q")String query, @Query("page") int page, @Query("api-key") String key);
+
+    //http://api.nytimes.com/svc/search/v2/articlesearch.json?q=ussr&page=1&api-key=0343ec428ded42d19bb3f04b015c2e2b
 
     @GET("svc/news/v3/content/all/fashion.json")
     Call<NewsArr> getFashion(@Query("api-key") String key);
