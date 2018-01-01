@@ -1,4 +1,4 @@
-package com.example.guest.newyorktimesclient;
+package com.example.guest.newyorktimesclient.utils;
 
 import android.support.v7.widget.LinearLayoutManager;
         import android.support.v7.widget.RecyclerView;

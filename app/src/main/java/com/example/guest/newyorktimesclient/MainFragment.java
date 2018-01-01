@@ -1,6 +1,5 @@
 package com.example.guest.newyorktimesclient;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
@@ -15,7 +14,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,10 +23,11 @@ import com.example.guest.newyorktimesclient.Model.QueryModel.Doc;
 import com.example.guest.newyorktimesclient.Model.QueryModel.Multimedium;
 import com.example.guest.newyorktimesclient.Model.QueryModel.QueryArr;
 import com.example.guest.newyorktimesclient.Model.LatestModel.Result;
+import com.example.guest.newyorktimesclient.utils.App;
+import com.example.guest.newyorktimesclient.utils.EndlessScrollImplementation;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import retrofit2.Call;
