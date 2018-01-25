@@ -24,6 +24,7 @@ import com.example.guest.newyorktimesclient.utils.EndlessScrollImplementation;
 import com.example.guest.newyorktimesclient.utils.NewsAdapter;
 import com.example.guest.newyorktimesclient.utils.NytApi;
 import com.example.guest.newyorktimesclient.utils.QueryPreferences;
+import com.example.guest.newyorktimesclient.utils.WrapContentLinearLayoutManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +66,7 @@ public class MainFragment extends Fragment {
                 false);
         mRecyclerView = (RecyclerView) v
                 .findViewById(R.id.posts_recycle_view);
-        linearLayoutManager = new LinearLayoutManager(getActivity());
+        linearLayoutManager = new WrapContentLinearLayoutManager(getActivity());
         mCompositeDisposable = new CompositeDisposable();
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.addOnScrollListener(new EndlessScrollImplementation(linearLayoutManager) {
