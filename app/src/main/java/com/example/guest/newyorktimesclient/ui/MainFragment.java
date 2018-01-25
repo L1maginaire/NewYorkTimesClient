@@ -1,7 +1,5 @@
 package com.example.guest.newyorktimesclient.ui;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,8 +12,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.example.guest.newyorktimesclient.di.components.DaggerNewsComponent;
 import com.example.guest.newyorktimesclient.di.components.NewsComponent;
@@ -25,9 +21,9 @@ import com.example.guest.newyorktimesclient.model.QueryModel.Multimedium;
 import com.example.guest.newyorktimesclient.model.LatestModel.Result;
 import com.example.guest.newyorktimesclient.R;
 import com.example.guest.newyorktimesclient.utils.EndlessScrollImplementation;
+import com.example.guest.newyorktimesclient.utils.NewsAdapter;
 import com.example.guest.newyorktimesclient.utils.NytApi;
 import com.example.guest.newyorktimesclient.utils.QueryPreferences;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +37,7 @@ public class MainFragment extends Fragment {
     private String API_KEY = "0343ec428ded42d19bb3f04b015c2e2b";
     private RecyclerView mRecyclerView;
     private LinearLayoutManager linearLayoutManager;
-    private Adapter adapter;
+    private NewsAdapter adapter;
     private List<Result> news;
     private int offset = 0;
     private NytApi nytApi;
@@ -75,7 +71,7 @@ public class MainFragment extends Fragment {
         mRecyclerView.addOnScrollListener(new EndlessScrollImplementation(linearLayoutManager) {
             @Override
             public void onLoadMore(int offset) {
-                fetchRecent(offset);
+                fetchRecent(offset); //todo: switch between recent and query
             }
         });
         NewsComponent daggerNewsComponent = DaggerNewsComponent.builder()
@@ -136,7 +132,7 @@ public class MainFragment extends Fragment {
 
     private void setupAdapter() {
         if (isAdded()) {
-            adapter = new Adapter(news);
+            adapter = new NewsAdapter(news, getContext());
             mRecyclerView.setAdapter(adapter);
         }
     }
@@ -192,65 +188,8 @@ public class MainFragment extends Fragment {
                         news.add(r);
                         counter++;
                     }
-                    adapter.notifyItemRangeInserted(offset + counter/*todo: проверка на нули и изменения числа*/, news.size());
+                    adapter.notifyItemRangeInserted(offset + counter/*todo: null-check and counter-check*/, news.size());
                 })
         );
-    }
-
-    class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
-
-        private List<Result> news;
-
-        public Adapter(List<Result> news) {
-            this.news = news;
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.news_item, parent, false);
-            ViewHolder holder = new ViewHolder(v);
-            return holder;
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            final Result post = news.get(position);
-            String imgUrl = post.getThumbnailStandard();
-            final Uri uri = Uri.parse(imgUrl);
-            Picasso.with(getContext()).load(uri).resize(75, 75).into(holder.imageView);
-            holder.title.setText(post.getTitle());
-            holder.summary.setText(post.getAbstract());
-            String s = post.getPublishedDate().substring(0, 10);
-            holder.published.setText(s);
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = BrowserActivity.newIntent(getActivity(), Uri.parse(post.getUrl()));
-                    startActivity(i);
-                }
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            if (news == null)
-                return 0;
-            return news.size();
-        }
-
-        class ViewHolder extends RecyclerView.ViewHolder {
-            ImageView imageView;
-            TextView title;
-            TextView summary;
-            TextView published;
-
-            public ViewHolder(View itemView) {
-                super(itemView);
-                imageView = (ImageView) itemView.findViewById(R.id.urlToImage);
-                title = (TextView) itemView.findViewById(R.id.news_title);
-                summary = (TextView) itemView.findViewById(R.id.news_summary);
-                published = (TextView) itemView.findViewById(R.id.publishedAt);
-            }
-        }
     }
 }
