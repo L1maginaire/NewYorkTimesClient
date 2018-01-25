@@ -1,4 +1,4 @@
-package com.example.guest.newyorktimesclient;
+package com.example.guest.newyorktimesclient.ui;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import com.example.guest.newyorktimesclient.R;
 
 public class BrowserFragment extends Fragment {
     public static final String ARG_URI = "url";

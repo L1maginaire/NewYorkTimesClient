@@ -1,4 +1,4 @@
-package com.example.guest.newyorktimesclient.Model.LatestModel;
+package com.example.guest.newyorktimesclient.model.LatestModel;
 
 import java.util.List;
 

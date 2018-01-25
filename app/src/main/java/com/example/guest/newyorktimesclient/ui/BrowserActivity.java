@@ -1,4 +1,4 @@
-package com.example.guest.newyorktimesclient;
+package com.example.guest.newyorktimesclient.ui;
 
 import android.content.Context;
 import android.content.Intent;

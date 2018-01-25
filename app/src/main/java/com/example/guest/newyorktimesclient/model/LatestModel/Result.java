@@ -1,4 +1,4 @@
-package com.example.guest.newyorktimesclient.Model.LatestModel;
+package com.example.guest.newyorktimesclient.model.LatestModel;
 
 import java.io.Serializable;
 import java.util.List;

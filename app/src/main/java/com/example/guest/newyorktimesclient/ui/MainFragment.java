@@ -1,4 +1,4 @@
-package com.example.guest.newyorktimesclient;
+package com.example.guest.newyorktimesclient.ui;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -16,23 +16,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.guest.newyorktimesclient.Model.LatestModel.NewsArr;
-import com.example.guest.newyorktimesclient.Model.QueryModel.Doc;
-import com.example.guest.newyorktimesclient.Model.QueryModel.Multimedium;
-import com.example.guest.newyorktimesclient.Model.QueryModel.QueryArr;
-import com.example.guest.newyorktimesclient.Model.LatestModel.Result;
-import com.example.guest.newyorktimesclient.utils.App;
+import com.example.guest.newyorktimesclient.di.components.DaggerNewsComponent;
+import com.example.guest.newyorktimesclient.di.components.NewsComponent;
+import com.example.guest.newyorktimesclient.di.modules.ContextModule;
+import com.example.guest.newyorktimesclient.model.QueryModel.Doc;
+import com.example.guest.newyorktimesclient.model.QueryModel.Multimedium;
+import com.example.guest.newyorktimesclient.model.LatestModel.Result;
+import com.example.guest.newyorktimesclient.R;
 import com.example.guest.newyorktimesclient.utils.EndlessScrollImplementation;
+import com.example.guest.newyorktimesclient.utils.NytApi;
+import com.example.guest.newyorktimesclient.utils.QueryPreferences;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class MainFragment extends Fragment {
     private static final String TAG = MainFragment.class.getSimpleName();
@@ -42,6 +44,8 @@ public class MainFragment extends Fragment {
     private Adapter adapter;
     private List<Result> news;
     private int offset = 0;
+    private NytApi nytApi;
+    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
     public static MainFragment newInstance() {
         Bundle args = new Bundle();
@@ -73,9 +77,12 @@ public class MainFragment extends Fragment {
                 fetch(offset);
             }
         });
+        NewsComponent daggerNewsComponent = DaggerNewsComponent.builder()
+                .contextModule(new ContextModule(getContext()))
+                .build();
+        nytApi = daggerNewsComponent.getNewsService();
         fetch(offset);
         setupAdapter();
-        updateItems();
 
         return v;
     }
@@ -103,14 +110,13 @@ public class MainFragment extends Fragment {
                         Log.d(TAG, "QueryTextSubmit: " + s);
                         searchView.clearFocus();
                         QueryPreferences.setStoredQuery(getActivity(), s);
-                        App.getApi().getQuery(s, 1, API_KEY).enqueue(new Callback<QueryArr>() {
-                            @Override
-                            public void onResponse(Call<QueryArr> call, Response<QueryArr> response) {
-                                if (response.isSuccessful() || response.body() != null) {
-                                    news = new ArrayList<>();
-                                    com.example.guest.newyorktimesclient.Model.QueryModel.Response resp = response.body().getResponse();
-                                    List<Doc> docs = resp.getDocs();
-                                    for (Doc d : docs) {
+                        mCompositeDisposable.clear();
+                        mCompositeDisposable.add(nytApi.getQuery(s, 1, API_KEY)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .map(data -> data.getResponse().getDocs())
+                                .subscribe(results -> {
+                                    for (Doc d : results) {
                                         if (d == null)
                                             continue;
                                         List<Multimedium> l = d.getMultimedia();
@@ -142,21 +148,8 @@ public class MainFragment extends Fragment {
                                     }
                                     adapter = new Adapter(news);
                                     mRecyclerView.setAdapter(adapter);
-                                } else {
-                                    try {
-                                        Log.d(TAG, response.body().getCopyright());
-                                    } catch (NullPointerException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<QueryArr> call, Throwable t) {
-                                t.printStackTrace();
-                                Toast.makeText(getActivity(), "An error occurred during networking", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                                })
+                        );
                         return true;
                     }
 
@@ -167,14 +160,9 @@ public class MainFragment extends Fragment {
                     }
                 });
 
-        searchView.setOnSearchClickListener(new View.OnClickListener()
-
-        {
-            @Override
-            public void onClick(View v) {
-                String query = QueryPreferences.getStoredQuery(getActivity());
-                searchView.setQuery(query, false);
-            }
+        searchView.setOnSearchClickListener(v -> {
+            String query = QueryPreferences.getStoredQuery(getActivity());
+            searchView.setQuery(query, false);
         });
     }
 
@@ -185,19 +173,14 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private void updateItems() {
-        String query = QueryPreferences.getStoredQuery(getActivity());
-    }
-
     void fetch(final int offset) {
-        App.getApi().getDefault(20, API_KEY, offset).enqueue(new Callback<NewsArr>() {
-            @Override
-            public void onResponse(Call<NewsArr> call, Response<NewsArr> response) {
-                if (response.isSuccessful() || response.body() != null) {
-                    List<Result> callbackArr = response.body().getResults();
+        mCompositeDisposable.add(nytApi.getDefault(20, API_KEY, offset).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(data -> data.getResults())
+                .subscribe(results -> {
                     int counter = 0;
-                    for (int i = 0; i < callbackArr.size(); i++) {
-                        Result r = callbackArr.get(i);
+                    for (int i = 0; i < results.size(); i++) {
+                        Result r = results.get(i);
                         String summary = r.getAbstract();
                         String title = r.getTitle();
                         String pic = r.getThumbnailStandard();
@@ -208,23 +191,9 @@ public class MainFragment extends Fragment {
                         counter++;
                     }
                     adapter.notifyItemRangeInserted(offset + counter/*todo: проверка на нули и изменения числа*/, news.size());
-                } else {
-                    try {
-                        Log.d(TAG, response.body().getResults().toString());
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<NewsArr> call, Throwable t) {
-                t.printStackTrace();
-                Toast.makeText(getActivity(), "An error occurred during networking", Toast.LENGTH_SHORT).show();
-            }
-        });
+                })
+        );
     }
-
 
     class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 

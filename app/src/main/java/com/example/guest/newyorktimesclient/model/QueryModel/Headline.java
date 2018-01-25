@@ -1,4 +1,4 @@
-package com.example.guest.newyorktimesclient.Model.QueryModel;
+package com.example.guest.newyorktimesclient.model.QueryModel;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

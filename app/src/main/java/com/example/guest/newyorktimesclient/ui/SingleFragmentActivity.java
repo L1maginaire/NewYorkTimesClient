@@ -1,4 +1,4 @@
-package com.example.guest.newyorktimesclient;
+package com.example.guest.newyorktimesclient.ui;
 
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+
+import com.example.guest.newyorktimesclient.R;
 
 public abstract class SingleFragmentActivity extends AppCompatActivity {
     protected abstract Fragment createFragment();

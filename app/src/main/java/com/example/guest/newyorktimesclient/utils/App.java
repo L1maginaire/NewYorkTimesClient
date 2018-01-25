@@ -10,9 +10,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class App extends Application {
 
-    private static NYTAPI nApi;
+    private static NytApi nApi;
 
-    public static NYTAPI getApi() {
+    public static NytApi getApi() {
         OkHttpClient okHttpClient = new OkHttpClient().newBuilder()
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .readTimeout(60, TimeUnit.SECONDS)
@@ -23,7 +23,7 @@ public class App extends Application {
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        nApi = retrofit.create(NYTAPI.class);
+        nApi = retrofit.create(NytApi.class);
         return nApi;
     }
 }
