@@ -45,7 +45,7 @@ public class MainFragment extends Fragment {
     private List<Result> news;
     private int offset = 0;
     private NytApi nytApi;
-    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+    private CompositeDisposable mCompositeDisposable;
 
     public static MainFragment newInstance() {
         Bundle args = new Bundle();
@@ -70,6 +70,7 @@ public class MainFragment extends Fragment {
         mRecyclerView = (RecyclerView) v
                 .findViewById(R.id.posts_recycle_view);
         linearLayoutManager = new LinearLayoutManager(getActivity());
+        mCompositeDisposable = new CompositeDisposable();
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.addOnScrollListener(new EndlessScrollImplementation(linearLayoutManager) {
             @Override
@@ -93,15 +94,12 @@ public class MainFragment extends Fragment {
         menuInflater.inflate(R.menu.main_fragment, menu);
         final MenuItem searchItem = menu.findItem(R.id.menu_item_search);
         final SearchView searchView = (SearchView) searchItem.getActionView();
-        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                searchView.clearFocus();
-                news = new ArrayList<>();
-                fetch(0);
-                setupAdapter();
-                return true;
-            }
+        searchView.setOnCloseListener(() -> {
+            searchView.clearFocus();
+            news = new ArrayList<>();
+            fetch(0);
+            setupAdapter();
+            return true;
         });
         searchView.setOnQueryTextListener
                 (new SearchView.OnQueryTextListener() {
@@ -116,7 +114,8 @@ public class MainFragment extends Fragment {
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .map(data -> data.getResponse().getDocs())
                                 .subscribe(results -> {
-                                    for (Doc d : results) {
+                                    news = new ArrayList<>();
+                                    for (Doc d : results) { //todo separated method
                                         if (d == null)
                                             continue;
                                         List<Multimedium> l = d.getMultimedia();
@@ -146,8 +145,7 @@ public class MainFragment extends Fragment {
                                         r.setPublishedDate(date);
                                         news.add(r);
                                     }
-                                    adapter = new Adapter(news);
-                                    mRecyclerView.setAdapter(adapter);
+                                    setupAdapter();
                                 })
                         );
                         return true;
