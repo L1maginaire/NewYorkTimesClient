@@ -75,14 +75,14 @@ public class MainFragment extends Fragment {
         mRecyclerView.addOnScrollListener(new EndlessScrollImplementation(linearLayoutManager) {
             @Override
             public void onLoadMore(int offset) {
-                fetch(offset);
+                fetchRecent(offset);
             }
         });
         NewsComponent daggerNewsComponent = DaggerNewsComponent.builder()
                 .contextModule(new ContextModule(getContext()))
                 .build();
         nytApi = daggerNewsComponent.getNewsService();
-        fetch(offset);
+        fetchRecent(offset);
         setupAdapter();
 
         return v;
@@ -97,7 +97,7 @@ public class MainFragment extends Fragment {
         searchView.setOnCloseListener(() -> {
             searchView.clearFocus();
             news = new ArrayList<>();
-            fetch(0);
+            fetchRecent(0);
             setupAdapter();
             return true;
         });
@@ -114,37 +114,7 @@ public class MainFragment extends Fragment {
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .map(data -> data.getResponse().getDocs())
                                 .subscribe(results -> {
-                                    news = new ArrayList<>();
-                                    for (Doc d : results) { //todo separated method
-                                        if (d == null)
-                                            continue;
-                                        List<Multimedium> l = d.getMultimedia();
-                                        if (l == null || l.size() == 0)
-                                            continue;
-                                        Multimedium m = d.getMultimedia().get(0);
-                                        Result r = new Result();
-                                        String picUrl = m.getUrl();
-                                        if (picUrl == null || picUrl.isEmpty())
-                                            continue;
-                                        r.setThumbnailStandard("https://static01.nyt.com/" + picUrl);
-                                        String snippet = d.getSnippet();
-                                        if (snippet == null || snippet.isEmpty())
-                                            continue;
-                                        r.setAbstract(snippet);
-                                        String printHeadline = d.getHeadline().getPrintHeadline();
-                                        if (printHeadline == null || printHeadline.isEmpty())
-                                            continue;
-                                        r.setTitle(printHeadline);
-                                        String url = d.getWebUrl();
-                                        if (url == null || url.isEmpty())
-                                            continue;
-                                        r.setUrl(url);
-                                        String date = d.getPubDate();
-                                        if (date == null || date.isEmpty())
-                                            continue;
-                                        r.setPublishedDate(date);
-                                        news.add(r);
-                                    }
+                                    fetchByQuery(results);
                                     setupAdapter();
                                 })
                         );
@@ -171,7 +141,41 @@ public class MainFragment extends Fragment {
         }
     }
 
-    void fetch(final int offset) {
+    void fetchByQuery(List<Doc> results){
+        news = new ArrayList<>();
+        for (Doc d : results) {
+            if (d == null)
+                continue;
+            List<Multimedium> l = d.getMultimedia();
+            if (l == null || l.size() == 0)
+                continue;
+            Multimedium m = d.getMultimedia().get(0);
+            Result r = new Result();
+            String picUrl = m.getUrl();
+            if (picUrl == null || picUrl.isEmpty())
+                continue;
+            r.setThumbnailStandard("https://static01.nyt.com/" + picUrl);
+            String snippet = d.getSnippet();
+            if (snippet == null || snippet.isEmpty())
+                continue;
+            r.setAbstract(snippet);
+            String printHeadline = d.getHeadline().getPrintHeadline();
+            if (printHeadline == null || printHeadline.isEmpty())
+                continue;
+            r.setTitle(printHeadline);
+            String url = d.getWebUrl();
+            if (url == null || url.isEmpty())
+                continue;
+            r.setUrl(url);
+            String date = d.getPubDate();
+            if (date == null || date.isEmpty())
+                continue;
+            r.setPublishedDate(date);
+            news.add(r);
+        }
+    }
+
+    void fetchRecent(final int offset) {
         mCompositeDisposable.add(nytApi.getDefault(20, API_KEY, offset).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(data -> data.getResults())
