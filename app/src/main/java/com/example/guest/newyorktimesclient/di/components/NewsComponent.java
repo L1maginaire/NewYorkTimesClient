@@ -7,7 +7,7 @@ package com.example.guest.newyorktimesclient.di.components;
 import com.example.guest.newyorktimesclient.di.modules.NewsModule;
 import com.example.guest.newyorktimesclient.interfaces.ApplicationScope;
 import dagger.Component;
-import com.example.guest.newyorktimesclient.utils.NytApi;
+import com.example.guest.newyorktimesclient.interfaces.NytApi;
 
 @ApplicationScope
 @Component(modules = {NewsModule.class})
