@@ -1,7 +1,7 @@
 package com.example.guest.newyorktimesclient.ui;
 
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -13,16 +13,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.guest.newyorktimesclient.R;
 import com.example.guest.newyorktimesclient.di.components.DaggerNewsComponent;
 import com.example.guest.newyorktimesclient.di.components.NewsComponent;
 import com.example.guest.newyorktimesclient.di.modules.ContextModule;
+import com.example.guest.newyorktimesclient.interfaces.NytApi;
+import com.example.guest.newyorktimesclient.model.LatestModel.Result;
 import com.example.guest.newyorktimesclient.model.QueryModel.Doc;
 import com.example.guest.newyorktimesclient.model.QueryModel.Multimedium;
-import com.example.guest.newyorktimesclient.model.LatestModel.Result;
-import com.example.guest.newyorktimesclient.R;
 import com.example.guest.newyorktimesclient.utils.EndlessScrollImplementation;
 import com.example.guest.newyorktimesclient.utils.NewsAdapter;
-import com.example.guest.newyorktimesclient.utils.NytApi;
+import com.example.guest.newyorktimesclient.utils.OnQueryTextListenerWrapper;
 import com.example.guest.newyorktimesclient.utils.QueryPreferences;
 import com.example.guest.newyorktimesclient.utils.WrapContentLinearLayoutManager;
 
@@ -36,13 +37,13 @@ import io.reactivex.schedulers.Schedulers;
 public class MainFragment extends Fragment {
     private static final String TAG = MainFragment.class.getSimpleName();
     private String API_KEY = "0343ec428ded42d19bb3f04b015c2e2b";
-    private RecyclerView mRecyclerView;
+    private RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
     private NewsAdapter adapter;
     private List<Result> news;
     private int offset = 0;
     private NytApi nytApi;
-    private CompositeDisposable mCompositeDisposable;
+    private CompositeDisposable compositeDisposable;
 
     public static MainFragment newInstance() {
         Bundle args = new Bundle();
@@ -64,12 +65,12 @@ public class MainFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_main, container,
                 false);
-        mRecyclerView = (RecyclerView) v
+        recyclerView = (RecyclerView) v
                 .findViewById(R.id.posts_recycle_view);
         linearLayoutManager = new WrapContentLinearLayoutManager(getActivity());
-        mCompositeDisposable = new CompositeDisposable();
-        mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerView.addOnScrollListener(new EndlessScrollImplementation(linearLayoutManager) {
+        compositeDisposable = new CompositeDisposable();
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.addOnScrollListener(new EndlessScrollImplementation(linearLayoutManager) {
             @Override
             public void onLoadMore(int offset) {
                 fetchRecent(offset); //todo: switch between recent and query
@@ -99,14 +100,14 @@ public class MainFragment extends Fragment {
             return true;
         });
         searchView.setOnQueryTextListener
-                (new SearchView.OnQueryTextListener() {
+                (new OnQueryTextListenerWrapper() {
                     @Override
                     public boolean onQueryTextSubmit(String s) {
                         Log.d(TAG, "QueryTextSubmit: " + s);
                         searchView.clearFocus();
                         QueryPreferences.setStoredQuery(getActivity(), s);
-                        mCompositeDisposable.clear();
-                        mCompositeDisposable.add(nytApi.getQuery(s, 1, API_KEY)
+                        compositeDisposable.clear();
+                        compositeDisposable.add(nytApi.getQuery(s, 1, API_KEY)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .map(data -> data.getResponse().getDocs())
@@ -116,12 +117,6 @@ public class MainFragment extends Fragment {
                                 })
                         );
                         return true;
-                    }
-
-                    @Override
-                    public boolean onQueryTextChange(String s) {
-                        Log.d(TAG, "QueryTextChange: " + s);
-                        return false;
                     }
                 });
 
@@ -134,7 +129,7 @@ public class MainFragment extends Fragment {
     private void setupAdapter() {
         if (isAdded()) {
             adapter = new NewsAdapter(news, getContext());
-            mRecyclerView.setAdapter(adapter);
+            recyclerView.setAdapter(adapter);
         }
     }
 
@@ -173,7 +168,7 @@ public class MainFragment extends Fragment {
     }
 
     void fetchRecent(final int offset) {
-        mCompositeDisposable.add(nytApi.getDefault(20, API_KEY, offset).subscribeOn(Schedulers.io())
+        compositeDisposable.add(nytApi.getDefault(20, API_KEY, offset).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(data -> data.getResults())
                 .subscribe(results -> {

@@ -5,7 +5,7 @@ package com.example.guest.newyorktimesclient.di.modules;
  */
 
 import com.example.guest.newyorktimesclient.interfaces.ApplicationScope;
-import com.example.guest.newyorktimesclient.utils.NytApi;
+import com.example.guest.newyorktimesclient.interfaces.NytApi;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;

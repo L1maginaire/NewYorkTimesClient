@@ -1,4 +1,4 @@
-package com.example.guest.newyorktimesclient.utils;
+package com.example.guest.newyorktimesclient.interfaces;
 
 import com.example.guest.newyorktimesclient.model.LatestModel.NewsArr;
 import com.example.guest.newyorktimesclient.model.QueryModel.QueryArr;
