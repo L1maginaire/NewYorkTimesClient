@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.guest.newyorktimesclient.R;
 import com.example.guest.newyorktimesclient.di.components.DaggerNewsComponent;
@@ -40,7 +41,7 @@ public class MainFragment extends Fragment {
     private RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
     private NewsAdapter adapter;
-    private List<Result> news;
+    private List<Result> news = new ArrayList<>();
     private int offset = 0;
     private NytApi nytApi;
     private CompositeDisposable compositeDisposable;
@@ -57,7 +58,6 @@ public class MainFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         setHasOptionsMenu(true);
-        news = new ArrayList<>();
     }
 
     @Override
@@ -133,7 +133,7 @@ public class MainFragment extends Fragment {
         }
     }
 
-    void fetchByQuery(List<Doc> results){
+    void fetchByQuery(List<Doc> results) {
         news = new ArrayList<>();
         for (Doc d : results) {
             if (d == null)

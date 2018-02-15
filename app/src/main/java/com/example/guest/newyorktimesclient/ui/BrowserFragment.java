@@ -12,10 +12,14 @@ import android.webkit.WebViewClient;
 
 import com.example.guest.newyorktimesclient.R;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class BrowserFragment extends Fragment {
+    @BindView(R.id.webView) WebView webView;
+
     public static final String ARG_URI = "url";
     private Uri mUri;
-    private WebView webView;
 
     public static BrowserFragment newInstance(Uri uri) {
         Bundle args = new Bundle();
@@ -34,8 +38,8 @@ public class BrowserFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.webview, container, false);
-        webView = (WebView) v.findViewById(R.id.webView);
+        View view = inflater.inflate(R.layout.webview, container, false);
+        ButterKnife.bind(this, view);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient(){
             public boolean shouldOverrideUrlLoading(WebView view, String url){
@@ -43,6 +47,6 @@ public class BrowserFragment extends Fragment {
             }
         });
         webView.loadUrl(mUri.toString());
-        return v;
+        return view;
     }
 }
