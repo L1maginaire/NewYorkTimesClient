@@ -8,4 +8,6 @@
     <string name="clear_search">Clear search</string>
     <string name="quick_share">Quick share</string>
     <string name="quick_browser">Quick browser</string>
+    <string name="errorMsg">The network connection was lost!</string>
+    <string name="repeat">Repeat</string>
 </resources>
