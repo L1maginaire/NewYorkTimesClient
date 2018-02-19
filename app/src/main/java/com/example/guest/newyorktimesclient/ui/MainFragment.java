@@ -12,8 +12,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
+import com.example.guest.newyorktimesclient.BuildConfig;
 import com.example.guest.newyorktimesclient.R;
 import com.example.guest.newyorktimesclient.di.components.DaggerNewsComponent;
 import com.example.guest.newyorktimesclient.di.components.NewsComponent;
@@ -37,7 +37,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class MainFragment extends Fragment {
     private static final String TAG = MainFragment.class.getSimpleName();
-    private String API_KEY = "0343ec428ded42d19bb3f04b015c2e2b";
+    private String API_KEY = BuildConfig.API_KEY;
     private RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
     private NewsAdapter adapter;

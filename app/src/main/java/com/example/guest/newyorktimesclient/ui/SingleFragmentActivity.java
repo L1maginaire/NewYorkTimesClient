@@ -27,6 +27,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
         setContentView(getLayoutResId());
 
         if (!isOnline()) {
+            Toast.makeText(this, "Please, check your Internet connection", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -45,7 +46,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
     private boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        Toast.makeText(this, "Please, check your Internet connection", Toast.LENGTH_SHORT).show();
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 }
