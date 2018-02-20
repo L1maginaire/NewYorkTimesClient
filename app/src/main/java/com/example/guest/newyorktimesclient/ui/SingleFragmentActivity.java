@@ -26,12 +26,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutResId());
 
-        if (!isOnline()) {
-            Toast.makeText(this, "Please, check your Internet connection", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
-
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
 
@@ -41,11 +35,5 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
                     .add(R.id.fragment_container, fragment)
                     .commit();
         }
-    }
-
-    private boolean isOnline() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 }

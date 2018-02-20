@@ -1,5 +1,8 @@
 package com.example.guest.newyorktimesclient.ui;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,6 +15,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
 
 import com.example.guest.newyorktimesclient.BuildConfig;
 import com.example.guest.newyorktimesclient.R;
@@ -45,6 +50,8 @@ public class MainFragment extends Fragment {
     private int offset = 0;
     private NytApi nytApi;
     private CompositeDisposable compositeDisposable;
+    private Button repeatButton;
+    private FrameLayout errorLayout;
 
     public static MainFragment newInstance() {
         Bundle args = new Bundle();
@@ -65,8 +72,20 @@ public class MainFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_main, container,
                 false);
-        recyclerView = (RecyclerView) v
-                .findViewById(R.id.posts_recycle_view);
+        errorLayout = v.findViewById(R.id.errorLayout);
+        repeatButton = v.findViewById(R.id.btn_repeat);
+        repeatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isOnline()) {
+                    repeatButton.setVisibility(View.INVISIBLE);
+                    errorLayout.setVisibility(View.INVISIBLE);
+                    fetchRecent(offset);
+                    setupAdapter();
+                }
+            }
+        });
+        recyclerView = (RecyclerView) v.findViewById(R.id.posts_recycle_view);
         linearLayoutManager = new WrapContentLinearLayoutManager(getActivity());
         compositeDisposable = new CompositeDisposable();
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -80,8 +99,11 @@ public class MainFragment extends Fragment {
                 .contextModule(new ContextModule(getContext()))
                 .build();
         nytApi = daggerNewsComponent.getNewsService();
-        fetchRecent(offset);
-        setupAdapter();
+        if (!isOnline()) {
+            repeatButton.setVisibility(View.VISIBLE);
+            errorLayout.setVisibility(View.VISIBLE);
+        }
+
 
         return v;
     }
@@ -187,5 +209,12 @@ public class MainFragment extends Fragment {
                     adapter.notifyItemRangeInserted(offset + counter/*todo: null-check and counter-check*/, news.size());
                 })
         );
+    }
+
+    private boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 }

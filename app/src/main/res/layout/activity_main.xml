@@ -1,13 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/activity_main"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:visibility="visible">
+
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center_horizontal|bottom"
         android:layout_weight="5"
-        android:id="@+id/posts_recycle_view" />
-</LinearLayout>
+        android:id="@+id/posts_recycle_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <FrameLayout
+        android:id="@+id/errorLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        tools:visibility="visible"
+        >
+
+        <include
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            layout="@layout/connection_error" />
+    </FrameLayout>
+
+</android.support.constraint.ConstraintLayout>

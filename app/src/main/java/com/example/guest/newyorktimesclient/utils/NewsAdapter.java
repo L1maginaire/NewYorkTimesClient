@@ -23,11 +23,11 @@ import java.util.List;
 
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
     private List<Result> news;
-    private Context mContext;
+    private Context context;
 
-    public NewsAdapter(List<Result> news, Context mContext) {
+    public NewsAdapter(List<Result> news, Context context) {
         this.news = news;
-        this.mContext = mContext;
+        this.context = context;
     }
 
     @Override
@@ -42,14 +42,14 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
         final Result post = news.get(position);
         String imgUrl = post.getThumbnailStandard();
         final Uri uri = Uri.parse(imgUrl);
-        Picasso.with(mContext).load(uri).resize(75, 75).into(holder.imageView);
+        Picasso.with(context).load(uri).resize(75, 75).into(holder.imageView);
         holder.title.setText(post.getTitle());
         holder.summary.setText(post.getAbstract());
         String s = post.getPublishedDate().substring(0, 10);
         holder.published.setText(s);
         holder.itemView.setOnClickListener(v -> {
-            Intent i = BrowserActivity.newIntent(mContext, Uri.parse(post.getUrl()));
-            mContext.startActivity(i);
+            Intent i = BrowserActivity.newIntent(context, Uri.parse(post.getUrl()));
+            context.startActivity(i);
         });
     }
 
