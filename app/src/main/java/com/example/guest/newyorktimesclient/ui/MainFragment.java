@@ -40,7 +40,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class    MainFragment extends Fragment {
+//todo: io.reactivex.exceptions.OnErrorNotImplementedException: Unable to resolve host "api.nytimes.com":
+// No address associated with hostname
+// while switching off connection between scrolling
+public class MainFragment extends Fragment {
     private static final String TAG = MainFragment.class.getSimpleName();
     private String API_KEY = BuildConfig.API_KEY;
     private RecyclerView recyclerView;
