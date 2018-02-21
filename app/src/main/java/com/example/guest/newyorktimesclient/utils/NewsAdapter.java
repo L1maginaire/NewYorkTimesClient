@@ -39,16 +39,13 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final Result post = news.get(position);
-        String imgUrl = post.getThumbnailStandard();
-        final Uri uri = Uri.parse(imgUrl);
-        Picasso.with(context).load(uri).resize(75, 75).into(holder.imageView);
-        holder.title.setText(post.getTitle());
-        holder.summary.setText(post.getAbstract());
-        String s = post.getPublishedDate().substring(0, 10);
-        holder.published.setText(s);
+        final Result item = news.get(position);
+        Picasso.with(context).load(item.getThumbnailStandard()).into(holder.imageView);
+        holder.title.setText(item.getTitle());
+        holder.summary.setText(item.getAbstract());
+        holder.published.setText(item.getPublishedDate().substring(0, 10));
         holder.itemView.setOnClickListener(v -> {
-            Intent i = BrowserActivity.newIntent(context, Uri.parse(post.getUrl()));
+            Intent i = BrowserActivity.newIntent(context, Uri.parse(item.getUrl()));
             context.startActivity(i);
         });
     }

@@ -44,7 +44,6 @@ public class MainFragment extends Fragment {
     private static final String TAG = MainFragment.class.getSimpleName();
     private String API_KEY = BuildConfig.API_KEY;
     private RecyclerView recyclerView;
-    private LinearLayoutManager linearLayoutManager;
     private NewsAdapter adapter;
     private List<Result> news = new ArrayList<>();
     private int offset = 0;
@@ -52,13 +51,6 @@ public class MainFragment extends Fragment {
     private CompositeDisposable compositeDisposable;
     private Button repeatButton;
     private FrameLayout errorLayout;
-
-    public static MainFragment newInstance() {
-        Bundle args = new Bundle();
-        MainFragment fragment = new MainFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,7 +75,7 @@ public class MainFragment extends Fragment {
             }
         });
         recyclerView = (RecyclerView) v.findViewById(R.id.posts_recycle_view);
-        linearLayoutManager = new WrapContentLinearLayoutManager(getActivity());
+        LinearLayoutManager linearLayoutManager = new WrapContentLinearLayoutManager(getActivity());
         compositeDisposable = new CompositeDisposable();
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.addOnScrollListener(new EndlessScrollImplementation(linearLayoutManager) {
@@ -155,35 +147,35 @@ public class MainFragment extends Fragment {
 
     void fetchByQuery(List<Doc> results) {
         news = new ArrayList<>();
-        for (Doc d : results) {
-            if (d == null)
+        for (Doc doc : results) {
+            if (doc == null)
                 continue;
-            List<Multimedium> l = d.getMultimedia();
+            List<Multimedium> l = doc.getMultimedia();
             if (l == null || l.size() == 0)
                 continue;
-            Multimedium m = d.getMultimedia().get(0);
-            Result r = new Result();
+            Multimedium m = doc.getMultimedia().get(0);
+            Result result = new Result();
             String picUrl = m.getUrl();
             if (picUrl == null || picUrl.isEmpty())
                 continue;
-            r.setThumbnailStandard("https://static01.nyt.com/" + picUrl);
-            String snippet = d.getSnippet();
+            result.setThumbnailStandard("https://static01.nyt.com/" + picUrl);
+            String snippet = doc.getSnippet();
             if (snippet == null || snippet.isEmpty())
                 continue;
-            r.setAbstract(snippet);
-            String printHeadline = d.getHeadline().getPrintHeadline();
+            result.setAbstract(snippet);
+            String printHeadline = doc.getHeadline().getPrintHeadline();
             if (printHeadline == null || printHeadline.isEmpty())
                 continue;
-            r.setTitle(printHeadline);
-            String url = d.getWebUrl();
+            result.setTitle(printHeadline);
+            String url = doc.getWebUrl();
             if (url == null || url.isEmpty())
                 continue;
-            r.setUrl(url);
-            String date = d.getPubDate();
+            result.setUrl(url);
+            String date = doc.getPubDate();
             if (date == null || date.isEmpty())
                 continue;
-            r.setPublishedDate(date);
-            news.add(r);
+            result.setPublishedDate(date);
+            news.add(result);
         }
     }
 
