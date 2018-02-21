@@ -58,10 +58,11 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageView;
-        TextView title;
-        TextView summary;
-        TextView published;
+        // todo: Why ButterKnife cause NPE?
+        private ImageView imageView;
+        private TextView title;
+        private TextView summary;
+        private TextView published;
 
         public ViewHolder(View itemView) {
             super(itemView);
