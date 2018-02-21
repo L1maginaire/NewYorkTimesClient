@@ -74,15 +74,12 @@ public class MainFragment extends Fragment {
                 false);
         errorLayout = v.findViewById(R.id.errorLayout);
         repeatButton = v.findViewById(R.id.btn_repeat);
-        repeatButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isOnline()) {
-                    repeatButton.setVisibility(View.INVISIBLE);
-                    errorLayout.setVisibility(View.INVISIBLE);
-                    fetchRecent(offset);
-                    setupAdapter();
-                }
+        repeatButton.setOnClickListener(v1 -> {
+            if (isOnline()) {
+                repeatButton.setVisibility(View.INVISIBLE);
+                errorLayout.setVisibility(View.INVISIBLE);
+                fetchRecent(offset);
+                setupAdapter();
             }
         });
         recyclerView = (RecyclerView) v.findViewById(R.id.posts_recycle_view);
@@ -102,9 +99,10 @@ public class MainFragment extends Fragment {
         if (!isOnline()) {
             repeatButton.setVisibility(View.VISIBLE);
             errorLayout.setVisibility(View.VISIBLE);
+        } else {
+            fetchRecent(offset);
+            setupAdapter();
         }
-
-
         return v;
     }
 
