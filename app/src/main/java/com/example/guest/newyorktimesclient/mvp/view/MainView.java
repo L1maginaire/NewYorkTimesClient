@@ -11,6 +11,5 @@ import java.util.List;
 
 public interface MainView extends BaseView {
     void onEmpsLoaded(List<Article> cakes);
-    void onShowToast(String message);
     void onClearItems();
 }

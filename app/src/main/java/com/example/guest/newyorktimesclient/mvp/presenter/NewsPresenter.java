@@ -36,7 +36,6 @@ public class NewsPresenter extends BasePresenter<MainView> implements Observer<R
 
     @Override
     public void onError(Throwable e) {
-        getView().onShowToast("Error loading employees: " + e.getMessage());
     }
 
     @Override

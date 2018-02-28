@@ -57,7 +57,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
         final Article article = articles.get(position);
         Glide.with(context).load(article.getPicUrl())
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .into(holder.imageView);
+                .into(holder.pic);
         holder.title.setText(article.getTitle());
         holder.summary.setText(article.getSummary());
         holder.published.setText(article.getDate().substring(0, 10));

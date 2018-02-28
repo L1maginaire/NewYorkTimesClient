@@ -49,7 +49,7 @@ public class MainActivity extends BaseActivity implements MainView {
 
     private void loadNews() {
         if (NetworkChecker.isNetAvailable(this)) {
-            presenter.getNews();
+            presenter.getNews(1, "", 2);
         } else {
         }
     }
@@ -74,11 +74,11 @@ public class MainActivity extends BaseActivity implements MainView {
 
     @Override
     protected void resolveDaggerDependencies() {
-        DaggerNewsComponent.builder()
+        /*DaggerNewsComponent.builder()
                 .applicationComponent(getApplicationComponent())
                 .empsModule(new EmpsModule(this))
                 .build()
-                .inject(this);
+                .inject(this);*/
     }
 
     @Override

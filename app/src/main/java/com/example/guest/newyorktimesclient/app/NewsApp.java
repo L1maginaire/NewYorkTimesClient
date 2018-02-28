@@ -3,6 +3,7 @@ package com.example.guest.newyorktimesclient.app;
 import android.app.Application;
 
 import com.example.guest.newyorktimesclient.di.components.ApplicationComponent;
+import com.example.guest.newyorktimesclient.di.components.DaggerApplicationComponent;
 import com.example.guest.newyorktimesclient.di.modules.ApplicationModule;
 
 /**
