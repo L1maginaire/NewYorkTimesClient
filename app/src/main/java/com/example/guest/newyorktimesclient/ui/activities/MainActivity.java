@@ -5,16 +5,15 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
+import com.example.guest.newyorktimesclient.BuildConfig;
 import com.example.guest.newyorktimesclient.R;
 import com.example.guest.newyorktimesclient.base.BaseActivity;
 import com.example.guest.newyorktimesclient.di.components.DaggerNewsComponent;
+import com.example.guest.newyorktimesclient.di.modules.NewsModule;
 import com.example.guest.newyorktimesclient.mvp.model.Article;
-import com.example.guest.newyorktimesclient.mvp.model.LatestModel.News;
 import com.example.guest.newyorktimesclient.mvp.presenter.NewsPresenter;
 import com.example.guest.newyorktimesclient.mvp.view.MainView;
 import com.example.guest.newyorktimesclient.utils.NetworkChecker;
@@ -27,6 +26,8 @@ import javax.inject.Inject;
 import butterknife.BindView;
 
 public class MainActivity extends BaseActivity implements MainView {
+    private String API_KEY = BuildConfig.API_KEY;//todo перенести
+    private Integer offset = 0;
 
     @Inject
     protected NewsPresenter presenter;
@@ -49,8 +50,9 @@ public class MainActivity extends BaseActivity implements MainView {
 
     private void loadNews() {
         if (NetworkChecker.isNetAvailable(this)) {
-            presenter.getNews(1, "", 2);
+            presenter.getNews(20, API_KEY, offset);
         } else {
+
         }
     }
 
@@ -74,11 +76,11 @@ public class MainActivity extends BaseActivity implements MainView {
 
     @Override
     protected void resolveDaggerDependencies() {
-        /*DaggerNewsComponent.builder()
+        DaggerNewsComponent.builder()
                 .applicationComponent(getApplicationComponent())
-                .empsModule(new EmpsModule(this))
+                .newsModule(new NewsModule(this))
                 .build()
-                .inject(this);*/
+                .inject(this);
     }
 
     @Override

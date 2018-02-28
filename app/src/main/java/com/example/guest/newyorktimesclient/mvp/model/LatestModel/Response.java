@@ -16,7 +16,7 @@ public class Response {
     @SerializedName("num_results")
     @Expose
     private Integer numResults;
-    @SerializedName("news")
+    @SerializedName("results")
     @Expose
     private List<News> news = null;
 
