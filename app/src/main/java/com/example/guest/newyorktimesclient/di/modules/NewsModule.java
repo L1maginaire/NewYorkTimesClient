@@ -1,49 +1,35 @@
 package com.example.guest.newyorktimesclient.di.modules;
 
-/**
- * Created by l1maginaire on 1/3/18.
- */
-
-import com.example.guest.newyorktimesclient.interfaces.ApplicationScope;
-import com.example.guest.newyorktimesclient.interfaces.NytApi;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import com.example.guest.newyorktimesclient.api.NytApi;
+import com.example.guest.newyorktimesclient.di.scope.PerActivity;
+import com.example.guest.newyorktimesclient.mvp.view.MainView;
 
 import dagger.Module;
 import dagger.Provides;
-import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
-@Module(includes = OkHttpClientModule.class)
+/**
+ * Created by l1maginaire on 2/28/18.
+ */
+
+@Module
 public class NewsModule {
 
+    private MainView view;
+
+    public NewsModule(MainView view) {
+        this.view = view;
+    }
+
+    @PerActivity
     @Provides
-    public NytApi newsApi(Retrofit retrofit){
+    NytApi provideApiService(Retrofit retrofit) {
         return retrofit.create(NytApi.class);
     }
 
-    @ApplicationScope
+    @PerActivity
     @Provides
-    public Retrofit retrofit(OkHttpClient okHttpClient,
-                             GsonConverterFactory gsonConverterFactory, Gson gson){
-        return new Retrofit.Builder()
-                .baseUrl("https://api.nytimes.com/")
-                .client(okHttpClient)
-                .addConverterFactory(gsonConverterFactory)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
-    }
-
-    @Provides
-    public Gson gson(){
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        return gsonBuilder.create();
-    }
-
-    @Provides
-    public GsonConverterFactory gsonConverterFactory(Gson gson){
-        return GsonConverterFactory.create(gson);
+    MainView provideView() {
+        return view;
     }
 }

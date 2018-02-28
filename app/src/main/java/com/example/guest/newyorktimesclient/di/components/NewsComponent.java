@@ -5,13 +5,16 @@ package com.example.guest.newyorktimesclient.di.components;
  */
 
 import com.example.guest.newyorktimesclient.di.modules.NewsModule;
-import com.example.guest.newyorktimesclient.interfaces.ApplicationScope;
+import com.example.guest.newyorktimesclient.di.scope.PerActivity;
+import com.example.guest.newyorktimesclient.ui.activities.MainActivity;
+import com.example.test65.di.modules.EmpsModule;
+import com.example.test65.di.scope.PerActivity;
+import com.example.test65.ui.activities.MainActivity;
+
 import dagger.Component;
-import com.example.guest.newyorktimesclient.interfaces.NytApi;
 
-@ApplicationScope
-@Component(modules = {NewsModule.class})
+@PerActivity
+@Component(modules = NewsModule.class, dependencies = ApplicationComponent.class)
 public interface NewsComponent {
-
-    NytApi getNewsService();
+    void inject(MainActivity activity);
 }

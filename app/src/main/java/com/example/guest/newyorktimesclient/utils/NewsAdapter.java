@@ -11,8 +11,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.guest.newyorktimesclient.R;
-import com.example.guest.newyorktimesclient.model.LatestModel.Result;
-import com.example.guest.newyorktimesclient.ui.BrowserActivity;
+import com.example.guest.newyorktimesclient.mvp.model.LatestModel.News;
+import com.example.guest.newyorktimesclient.ui.activities.BrowserActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -22,10 +22,10 @@ import java.util.List;
  */
 
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
-    private List<Result> news;
+    private List<News> news;
     private Context context;
 
-    public NewsAdapter(List<Result> news, Context context) {
+    public NewsAdapter(List<News> news, Context context) {
         this.news = news;
         this.context = context;
     }
@@ -39,7 +39,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final Result item = news.get(position);
+        final News item = news.get(position);
         Picasso.with(context).load(item.getThumbnailStandard()).into(holder.imageView);
         holder.title.setText(item.getTitle());
         holder.summary.setText(item.getAbstract());
