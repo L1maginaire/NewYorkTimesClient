@@ -76,7 +76,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
 
     class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.urlToImage) ImageView pic;
-        @BindView(R.id.title) TextView title;
+        @BindView(R.id.news_title) TextView title;
         @BindView(R.id.news_summary) TextView summary;
         @BindView(R.id.publishedAt) TextView published;
 
