@@ -1,8 +1,6 @@
 package com.example.guest.newyorktimesclient.utils;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,66 +8,82 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.guest.newyorktimesclient.R;
+import com.example.guest.newyorktimesclient.mvp.model.Article;
 import com.example.guest.newyorktimesclient.mvp.model.LatestModel.News;
-import com.example.guest.newyorktimesclient.ui.activities.BrowserActivity;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
-/**
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+/*
  * Created by l1maginaire on 1/25/18.
- */
+ **/
+
 
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder>{
-    private List<News> news;
+    private List<Article> articles = new ArrayList<>();
     private Context context;
+    private LayoutInflater layoutInflater;
 
-    public NewsAdapter(List<News> news, Context context) {
-        this.news = news;
-        this.context = context;
+    public NewsAdapter(LayoutInflater layoutInflater) {
+        this.layoutInflater = layoutInflater;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.news_item, parent, false);
+        View v = layoutInflater.inflate(R.layout.news_item, parent, false);
         ViewHolder holder = new ViewHolder(v);
         return holder;
     }
 
+    public void addNews(List<Article> news) {
+        articles.addAll(news);
+        notifyDataSetChanged();
+    }
+
+    public void clearNews() {
+        articles.clear();
+        notifyDataSetChanged();
+    }
+
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final News item = news.get(position);
-        Picasso.with(context).load(item.getThumbnailStandard()).into(holder.imageView);
-        holder.title.setText(item.getTitle());
-        holder.summary.setText(item.getAbstract());
-        holder.published.setText(item.getPublishedDate().substring(0, 10));
+        final Article article = articles.get(position);
+        Glide.with(context).load(article.getPicUrl())
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .into(holder.imageView);
+        holder.title.setText(article.getTitle());
+        holder.summary.setText(article.getSummary());
+        holder.published.setText(article.getDate().substring(0, 10));
         holder.itemView.setOnClickListener(v -> {
-            Intent i = BrowserActivity.newIntent(context, Uri.parse(item.getUrl()));
-            context.startActivity(i);
+//            Intent i = BrowserActivity.newIntent(context, Uri.parse(item.getUrl()));
+//            context.startActivity(i);
         });
     }
 
     @Override
     public int getItemCount() {
-        if (news == null)
+        if (articles == null)
             return 0;
-        return news.size();
+        return articles.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        // todo: Why ButterKnife cause NPE?
-        private ImageView imageView;
-        private TextView title;
-        private TextView summary;
-        private TextView published;
+        @BindView(R.id.urlToImage) ImageView pic;
+        @BindView(R.id.title) TextView title;
+        @BindView(R.id.news_summary) TextView summary;
+        @BindView(R.id.publishedAt) TextView published;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            imageView = (ImageView) itemView.findViewById(R.id.urlToImage);
-            title = (TextView) itemView.findViewById(R.id.news_title);
-            summary = (TextView) itemView.findViewById(R.id.news_summary);
-            published = (TextView) itemView.findViewById(R.id.publishedAt);
+            context = itemView.getContext();
+            ButterKnife.bind(this, itemView);
         }
     }
 }

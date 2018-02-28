@@ -1,3 +1,4 @@
+/*
 package com.example.guest.newyorktimesclient.ui.fragments;
 
 import android.content.Context;
@@ -197,7 +198,9 @@ public class MainFragment extends Fragment {
                         news.add(r);
                         counter++;
                     }
-                    adapter.notifyItemRangeInserted(offset + counter/*todo: null-check and counter-check*/, news.size());
+                    adapter.notifyItemRangeInserted(offset + counter*/
+/*todo: null-check and counter-check*//*
+, news.size());
                 })
         );
     }
@@ -208,4 +211,4 @@ public class MainFragment extends Fragment {
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
-}
+}*/

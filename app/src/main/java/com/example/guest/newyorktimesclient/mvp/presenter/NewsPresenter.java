@@ -5,6 +5,7 @@ import com.example.guest.newyorktimesclient.base.BasePresenter;
 import com.example.guest.newyorktimesclient.mvp.model.LatestModel.Response;
 import com.example.guest.newyorktimesclient.mvp.model.Article;
 import com.example.guest.newyorktimesclient.mvp.view.MainView;
+import com.example.guest.newyorktimesclient.utils.NewsMapper;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class NewsPresenter extends BasePresenter<MainView> implements Observer<R
 
     @Inject
     protected NytApi apiService;
-    @Inject protected UsersMapper mapper;
+    @Inject protected NewsMapper mapper;
 
     @Inject
     public NewsPresenter() {
@@ -46,7 +47,7 @@ public class NewsPresenter extends BasePresenter<MainView> implements Observer<R
 
     @Override
     public void onNext(Response response) {
-        List<Article> employees = mapper.mapEmps(response);
+        List<Article> employees = mapper.mapNews(response);
         getView().onClearItems();
         getView().onEmpsLoaded(employees);
     }

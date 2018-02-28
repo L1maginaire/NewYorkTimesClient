@@ -1,3 +1,4 @@
+/*
 package com.example.guest.newyorktimesclient.ui.activities;
 
 import android.content.Context;
@@ -6,7 +7,6 @@ import android.net.Uri;
 import android.support.v4.app.Fragment;
 
 import com.example.guest.newyorktimesclient.ui.fragments.BrowserFragment;
-import com.example.guest.newyorktimesclient.ui.SingleFragmentActivity;
 
 public class BrowserActivity extends SingleFragmentActivity {
     public static Intent newIntent(Context context, Uri uri) {
@@ -19,4 +19,4 @@ public class BrowserActivity extends SingleFragmentActivity {
     protected Fragment createFragment() {
         return BrowserFragment.newInstance(getIntent().getData());
     }
-}
+}*/
