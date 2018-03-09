@@ -12,8 +12,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.guest.newyorktimesclient.R;
 import com.example.guest.newyorktimesclient.mvp.model.Article;
-import com.example.guest.newyorktimesclient.mvp.model.LatestModel.News;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;

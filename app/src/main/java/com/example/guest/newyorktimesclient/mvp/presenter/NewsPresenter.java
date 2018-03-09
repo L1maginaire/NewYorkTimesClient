@@ -46,8 +46,8 @@ public class NewsPresenter extends BasePresenter<MainView> implements Observer<R
 
     @Override
     public void onNext(Response response) {
-        List<Article> employees = mapper.mapNews(response);
+        List<Article> news = mapper.mapNews(response);
         getView().onClearItems();
-        getView().onEmpsLoaded(employees);
+        getView().onEmpsLoaded(news);
     }
 }
