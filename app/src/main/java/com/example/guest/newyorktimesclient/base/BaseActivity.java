@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.example.guest.newyorktimesclient.app.NewsApp;
 import com.example.guest.newyorktimesclient.di.components.ApplicationComponent;
+import com.example.guest.newyorktimesclient.service.impl2.PollService;
 
 import butterknife.ButterKnife;
 
@@ -23,6 +24,8 @@ public abstract class BaseActivity extends AppCompatActivity {
         setContentView(getContentView());
         ButterKnife.bind(this);
         onViewReady(savedInstanceState, getIntent());
+        Intent i = PollService.newIntent(this);
+        startService(i);
     }
 
     @CallSuper

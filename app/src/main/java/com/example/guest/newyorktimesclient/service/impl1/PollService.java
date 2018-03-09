@@ -1,3 +1,4 @@
+/*
 package com.example.guest.newyorktimesclient.service.impl1;
 
 import android.app.AlarmManager;
@@ -18,9 +19,11 @@ import com.example.guest.newyorktimesclient.utils.QueryPreferences;
 
 import java.util.List;
 
+*/
 /**
  * Created by l1maginaire on 3/9/18.
- */
+ *//*
+
 
 public class PollService {
     private static final String TAG = "PollService";
@@ -78,4 +81,4 @@ public class PollService {
 
         QueryPreferences.setLastResultId(context, resultTitle);
     }
-}
+}*/
