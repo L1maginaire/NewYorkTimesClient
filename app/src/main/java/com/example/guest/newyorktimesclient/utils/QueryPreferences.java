@@ -19,7 +19,7 @@ public class QueryPreferences {
                 .apply();
     }
 
-    public static String getLastResultId(Context context) {
+    public static String getLastResultTitle(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(PREF_LAST_RESULT_ID, null);
     }
