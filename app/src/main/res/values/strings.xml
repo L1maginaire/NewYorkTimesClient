@@ -10,4 +10,5 @@
     <string name="quick_browser">Quick browser</string>
     <string name="errorMsg">The network connection was lost!</string>
     <string name="repeat">Repeat</string>
+    <string name="got_news">News available.</string>
 </resources>

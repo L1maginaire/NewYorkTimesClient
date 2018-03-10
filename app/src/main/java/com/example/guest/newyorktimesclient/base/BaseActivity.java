@@ -24,7 +24,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         setContentView(getContentView());
         ButterKnife.bind(this);
         onViewReady(savedInstanceState, getIntent());
-        startService(new Intent(this, PollService.class));
+        PollService.setServiceAlarm(this, true);
     }
 
     @CallSuper
