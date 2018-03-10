@@ -2,7 +2,6 @@ package com.example.guest.newyorktimesclient.service;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -10,17 +9,13 @@ import android.util.Log;
 import com.example.guest.newyorktimesclient.BuildConfig;
 import com.example.guest.newyorktimesclient.api.NytApi;
 import com.example.guest.newyorktimesclient.app.NewsApp;
-import com.example.guest.newyorktimesclient.di.components.DaggerNewsComponent;
 import com.example.guest.newyorktimesclient.di.components.DaggerServiceComponent;
-import com.example.guest.newyorktimesclient.di.components.ServiceComponent;
-import com.example.guest.newyorktimesclient.di.modules.NewsModule;
 import com.example.guest.newyorktimesclient.di.modules.ServiceModule;
+import com.example.guest.newyorktimesclient.utils.QueryPreferences;
 
 import javax.inject.Inject;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 
 public class PollService extends IntentService {
     private static final String TAG = "PollService";
@@ -30,6 +25,7 @@ public class PollService extends IntentService {
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
     private String title;
+    private SharedPreferences prefs;
 
     public PollService() {
         super(TAG);
@@ -40,9 +36,8 @@ public class PollService extends IntentService {
         if (intent != null) {
             Log.d(TAG, "onHandleIntent: ");
             resolveDaggerDependencies();
-            getReultId();
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            
+            prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            boolean f = isLastMappedResultMatchingActual();
         }
     }
 
@@ -54,11 +49,10 @@ public class PollService extends IntentService {
                 .inject(this);
     }
 
-    private void getReultId() {
+    private boolean isLastMappedResultMatchingActual() {
         compositeDisposable.add(apiService.getDefault(20, BuildConfig.API_KEY, 0)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .map(data -> data.getNews())
                 .subscribe(news -> title = news.get(0).getTitle()));
+        return title == prefs.getString(QueryPreferences.PREF_LAST_RESULT_ID, null); //todo в каком потоке слушать?
     }
 }
