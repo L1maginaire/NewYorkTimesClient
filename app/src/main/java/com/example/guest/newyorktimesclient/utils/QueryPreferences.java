@@ -4,8 +4,8 @@ import android.content.Context;
 import android.preference.PreferenceManager;
 
 public class QueryPreferences {
-    private static final String PREF_SEARCH_QUERY = "searchQuery";
-    private static final String PREF_LAST_RESULT_ID = "lastResultId";
+    public static final String PREF_SEARCH_QUERY = "searchQuery";
+    public static final String PREF_LAST_RESULT_ID = "lastResultId";
 
     public static String getStoredQuery(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context)

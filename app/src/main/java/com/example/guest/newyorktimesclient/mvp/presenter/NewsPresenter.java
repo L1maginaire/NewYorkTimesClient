@@ -1,12 +1,16 @@
 package com.example.guest.newyorktimesclient.mvp.presenter;
 
+import android.content.Context;
+import android.util.Log;
+
 import com.example.guest.newyorktimesclient.BuildConfig;
 import com.example.guest.newyorktimesclient.api.NytApi;
 import com.example.guest.newyorktimesclient.base.BasePresenter;
-import com.example.guest.newyorktimesclient.mvp.model.LatestModel.Response;
 import com.example.guest.newyorktimesclient.mvp.model.Article;
+import com.example.guest.newyorktimesclient.mvp.model.LatestModel.Response;
 import com.example.guest.newyorktimesclient.mvp.view.MainView;
 import com.example.guest.newyorktimesclient.utils.NewsMapper;
+import com.example.guest.newyorktimesclient.utils.QueryPreferences;
 
 import java.util.List;
 
@@ -27,6 +31,8 @@ public class NewsPresenter extends BasePresenter<MainView> implements Observer<R
     protected NytApi apiService;
     @Inject
     protected NewsMapper mapper;
+    @Inject
+    protected Context context;
 
     @Inject
     public NewsPresenter() {
@@ -42,14 +48,18 @@ public class NewsPresenter extends BasePresenter<MainView> implements Observer<R
     }
 
     @Override
-    public void onComplete() {}
+    public void onComplete() {
+    }
 
     @Override
-    public void onSubscribe(Disposable d) {}
+    public void onSubscribe(Disposable d) {
+    }
 
     @Override
     public void onNext(Response response) {
         List<Article> news = mapper.mapNews(response);
+        Log.d("TITLE", news.get(0).getTitle());
+        QueryPreferences.setLastResultId(context, news.get(0).getTitle());
         getView().onClearItems();
         getView().onEmpsLoaded(news);
     }
