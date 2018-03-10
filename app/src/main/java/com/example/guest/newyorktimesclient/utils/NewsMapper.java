@@ -51,8 +51,38 @@ public class NewsMapper {
         }
         return articles;
     }
-    public List<Article> mapQuery(List<Doc> response){
 
+    public List<Article> mapQuery(List<Doc> response) {
+        articles = new ArrayList<>();
+        for (Doc single : response) {
+            if (single == null)
+                continue;
+            List<Multimedium> l = single.getMultimedia();
+            if (l == null || l.size() == 0)
+                continue;
+            Article article = new Article();
+            Multimedium m = single.getMultimedia().get(0);
+            if (m.getUrl() == null || m.getUrl().isEmpty())
+                continue;
+            article.setPicUrl("https://static01.nyt.com/" + m.getUrl());
+            String snippet = single.getSnippet();
+            if (snippet == null || snippet.isEmpty())
+                continue;
+            article.setSummary(snippet);
+            String printHeadline = single.getHeadline().getPrintHeadline();
+            if (printHeadline == null || printHeadline.isEmpty())
+                continue;
+            article.setTitle(printHeadline);
+            String url = single.getWebUrl();
+            if (url == null || url.isEmpty())
+                continue;
+            article.setWebUrl(url);
+            String date = single.getPubDate();
+            if (date == null || date.isEmpty())
+                continue;
+            article.setDate(date);
+            articles.add(article);
+        }
         return articles;
     }
 }

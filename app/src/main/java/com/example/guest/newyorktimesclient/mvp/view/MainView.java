@@ -10,6 +10,6 @@ import java.util.List;
  */
 
 public interface MainView extends BaseView {
-    void onEmpsLoaded(List<Article> cakes);
+    void onNewsLoaded(List<Article> cakes);
     void onClearItems();
 }

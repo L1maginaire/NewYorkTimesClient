@@ -48,7 +48,7 @@ public class NewsPresenter extends BasePresenter<MainView> {
                 Log.d("TITLE", news.get(0).getTitle());
                 QueryPreferences.setLastResultId(context, news.get(0).getTitle());
                 view.onClearItems();
-                view.onEmpsLoaded(news);
+                view.onNewsLoaded(news);
             }
 
             @Override
@@ -71,7 +71,7 @@ public class NewsPresenter extends BasePresenter<MainView> {
                 Log.d("TITLE", news.get(0).getTitle());
                 QueryPreferences.setLastResultId(context, news.get(0).getTitle());//todo
                 view.onClearItems();
-                view.onEmpsLoaded(news);
+                view.onNewsLoaded(news);
             }
 
             @Override
