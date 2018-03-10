@@ -26,8 +26,8 @@
             android:configChanges="keyboardHidden|orientation|screenSize" />
         -->
         <service
-            android:name=".PollService"
-            android:exported="false"></service>
+            android:name=".service.PollService"
+            android:exported="false" />
     </application>
 
 </manifest>

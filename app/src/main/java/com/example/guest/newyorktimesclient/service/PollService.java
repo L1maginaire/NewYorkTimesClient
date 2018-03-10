@@ -1,4 +1,4 @@
-package com.example.guest.newyorktimesclient;
+package com.example.guest.newyorktimesclient.service;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -7,6 +7,7 @@ import android.util.Log;
 
 public class PollService extends IntentService {
     private static final String TAG = "PollService";
+
     public PollService() {
         super(TAG);
     }
@@ -14,7 +15,7 @@ public class PollService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
-            Log.d(TAG, "message");
+            Log.d(TAG, "onHandleIntent: ");
         }
     }
 }
