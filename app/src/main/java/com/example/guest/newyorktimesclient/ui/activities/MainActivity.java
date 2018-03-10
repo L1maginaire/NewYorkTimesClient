@@ -57,7 +57,6 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     private void setupAdapter() {
-        recyclerView = findViewById(R.id.posts_recycle_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         adapter = new NewsAdapter(getLayoutInflater());

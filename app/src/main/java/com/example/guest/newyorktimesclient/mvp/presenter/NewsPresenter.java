@@ -23,15 +23,16 @@ public class NewsPresenter extends BasePresenter<MainView> implements Observer<R
 
     @Inject
     protected NytApi apiService;
-    @Inject protected NewsMapper mapper;
+    @Inject
+    protected NewsMapper mapper;
 
     @Inject
     public NewsPresenter() {
     }
 
     public void getNews(int limit, String apiKey, int offset) {
-        Observable<Response> empsResponseObservable = apiService.getDefault(limit, apiKey, offset);
-        subscribe(empsResponseObservable, this);
+        Observable<Response> observable = apiService.getDefault(limit, apiKey, offset);
+        subscribe(observable, this);
     }
 
     @Override
@@ -46,8 +47,8 @@ public class NewsPresenter extends BasePresenter<MainView> implements Observer<R
 
     @Override
     public void onNext(Response response) {
-        List<Article> employees = mapper.mapNews(response);
+        List<Article> news = mapper.mapNews(response);
         getView().onClearItems();
-        getView().onEmpsLoaded(employees);
+        getView().onEmpsLoaded(news);
     }
 }

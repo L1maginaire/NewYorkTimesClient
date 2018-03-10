@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 
-import com.example.guest.newyorktimesclient.PollService;
 import com.example.guest.newyorktimesclient.app.NewsApp;
 import com.example.guest.newyorktimesclient.di.components.ApplicationComponent;
 
@@ -24,7 +23,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         setContentView(getContentView());
         ButterKnife.bind(this);
         onViewReady(savedInstanceState, getIntent());
-        startService(new Intent(this, PollService.class));
     }
 
     @CallSuper

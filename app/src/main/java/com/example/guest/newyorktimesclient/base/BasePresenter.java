@@ -20,7 +20,8 @@ public class BasePresenter<V extends BaseView> {
     }
 
     protected <T> void subscribe(Observable<T> observable, Observer<T> observer) {
-        observable.subscribeOn(Schedulers.io())
+        observable
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observer);
     }
