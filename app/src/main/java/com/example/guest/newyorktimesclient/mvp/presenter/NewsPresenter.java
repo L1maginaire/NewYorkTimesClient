@@ -1,5 +1,6 @@
 package com.example.guest.newyorktimesclient.mvp.presenter;
 
+import com.example.guest.newyorktimesclient.BuildConfig;
 import com.example.guest.newyorktimesclient.api.NytApi;
 import com.example.guest.newyorktimesclient.base.BasePresenter;
 import com.example.guest.newyorktimesclient.mvp.model.LatestModel.Response;
@@ -20,6 +21,7 @@ import io.reactivex.disposables.Disposable;
  */
 
 public class NewsPresenter extends BasePresenter<MainView> implements Observer<Response> {
+    private static final String API_KEY = BuildConfig.API_KEY;
 
     @Inject
     protected NytApi apiService;
@@ -30,8 +32,8 @@ public class NewsPresenter extends BasePresenter<MainView> implements Observer<R
     public NewsPresenter() {
     }
 
-    public void getNews(int limit, String apiKey, int offset) {
-        Observable<Response> observable = apiService.getDefault(limit, apiKey, offset);
+    public void getNews(int limit, int offset) {
+        Observable<Response> observable = apiService.getDefault(limit, API_KEY, offset);
         subscribe(observable, this);
     }
 

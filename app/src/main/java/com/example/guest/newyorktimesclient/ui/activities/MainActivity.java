@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import butterknife.BindView;
 
 public class MainActivity extends BaseActivity implements MainView {
-    private String API_KEY = BuildConfig.API_KEY;//todo перенести
     private Integer offset = 0;
 
     @Inject
@@ -50,7 +49,7 @@ public class MainActivity extends BaseActivity implements MainView {
 
     private void loadNews() {
         if (NetworkChecker.isNetAvailable(this)) {
-            presenter.getNews(20, API_KEY, offset);
+            presenter.getNews(20, offset);
         } else {
 
         }
