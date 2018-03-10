@@ -8,7 +8,6 @@ import android.view.Menu;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
-import com.example.guest.newyorktimesclient.BuildConfig;
 import com.example.guest.newyorktimesclient.R;
 import com.example.guest.newyorktimesclient.base.BaseActivity;
 import com.example.guest.newyorktimesclient.di.components.DaggerNewsComponent;
@@ -49,7 +48,7 @@ public class MainActivity extends BaseActivity implements MainView {
 
     private void loadNews() {
         if (NetworkChecker.isNetAvailable(this)) {
-            presenter.getNews(20, offset);
+            presenter.getRecentNews(20, offset);
         } else {
 
         }

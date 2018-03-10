@@ -8,6 +8,7 @@ import com.example.guest.newyorktimesclient.api.NytApi;
 import com.example.guest.newyorktimesclient.base.BasePresenter;
 import com.example.guest.newyorktimesclient.mvp.model.Article;
 import com.example.guest.newyorktimesclient.mvp.model.LatestModel.Response;
+import com.example.guest.newyorktimesclient.mvp.model.QueryModel.Doc;
 import com.example.guest.newyorktimesclient.mvp.view.MainView;
 import com.example.guest.newyorktimesclient.utils.NewsMapper;
 import com.example.guest.newyorktimesclient.utils.QueryPreferences;
@@ -24,7 +25,7 @@ import io.reactivex.disposables.Disposable;
  * Created by l1maginaire on 2/28/18.
  */
 
-public class NewsPresenter extends BasePresenter<MainView> implements Observer<Response> {
+public class NewsPresenter extends BasePresenter<MainView> {
     private static final String API_KEY = BuildConfig.API_KEY;
 
     @Inject
@@ -38,29 +39,49 @@ public class NewsPresenter extends BasePresenter<MainView> implements Observer<R
     public NewsPresenter() {
     }
 
-    public void getNews(int limit, int offset) {
+    public void getRecentNews(int limit, int offset) {
         Observable<Response> observable = apiService.getDefault(limit, API_KEY, offset);
-        subscribe(observable, this);
-    }
+        subscribe(observable, new Observer<Response>() {
+            @Override
+            public void onNext(Response response) {
+                List<Article> news = mapper.mapRecent(response);
+                Log.d("TITLE", news.get(0).getTitle());
+                QueryPreferences.setLastResultId(context, news.get(0).getTitle());
+                view.onClearItems();
+                view.onEmpsLoaded(news);
+            }
 
-    @Override
-    public void onError(Throwable e) {
-    }
+            @Override
+            public void onSubscribe(Disposable d) {}
 
-    @Override
-    public void onComplete() {
-    }
+            @Override
+            public void onError(Throwable e) {}
 
-    @Override
-    public void onSubscribe(Disposable d) {
+            @Override
+            public void onComplete() {}
+        });
     }
+    public void getQueryNews(String query, int offset){
+        Observable<List<Doc>> observable = apiService.getQuery(query, offset, API_KEY)
+                .map(data -> data.getResponse().getDocs());//todo целесообразность
+        subscribe(observable, new Observer<List<Doc>>() {
+            @Override
+            public void onNext(List<Doc> response) {
+                List<Article> news = mapper.mapQuery(response);
+                Log.d("TITLE", news.get(0).getTitle());
+                QueryPreferences.setLastResultId(context, news.get(0).getTitle());//todo
+                view.onClearItems();
+                view.onEmpsLoaded(news);
+            }
 
-    @Override
-    public void onNext(Response response) {
-        List<Article> news = mapper.mapNews(response);
-        Log.d("TITLE", news.get(0).getTitle());
-        QueryPreferences.setLastResultId(context, news.get(0).getTitle());
-        getView().onClearItems();
-        getView().onEmpsLoaded(news);
+            @Override
+            public void onSubscribe(Disposable d) {}
+
+            @Override
+            public void onError(Throwable e) {}
+
+            @Override
+            public void onComplete() {}
+        });
     }
 }
