@@ -1,5 +1,6 @@
 Simple app to provide recent news from "New York Times". Includes search by keyword.
 
-![screenshot of sample](https://image.ibb.co/esYnz6/Screenshot_20180115_014204.png)
-![screenshot of sample](https://image.ibb.co/h96qK6/Screenshot_20180115_015253.png)
-![screenshot of sample](https://image.ibb.co/gyK5mm/Screenshot_20180115_014329.png)
+<div align="center">
+<img src="/art/img3.png" width="281" height="500" border="10"/>
+<img src="/art/img2.png" width="281" height="500" border="10"/> 
+<img src="/art/img1.png" width="281" height="500" border="10"/></div>

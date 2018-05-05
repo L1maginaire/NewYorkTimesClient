@@ -1,4 +1,4 @@
-package com.example.guest.newyorktimesclient.service;
+    package com.example.guest.newyorktimesclient.service;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -26,7 +26,7 @@ import javax.inject.Inject;
 
 import io.reactivex.disposables.CompositeDisposable;
 
-public class PollService extends IntentService {
+public class PollService extends IntentService { //todo UNSUBSCRIBE
     private static final String TAG = "PollService";
 
     @Inject
