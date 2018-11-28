@@ -19,6 +19,7 @@ import com.example.guest.newyorktimesclient.api.NytApi;
 import com.example.guest.newyorktimesclient.app.NewsApp;
 import com.example.guest.newyorktimesclient.di.components.DaggerServiceComponent;
 import com.example.guest.newyorktimesclient.di.modules.ServiceModule;
+import com.example.guest.newyorktimesclient.mvp.model.LatestModel.Response;
 import com.example.guest.newyorktimesclient.ui.activities.MainActivity;
 import com.example.guest.newyorktimesclient.utils.QueryPreferences;
 
@@ -103,9 +104,9 @@ public class PollService extends IntentService { //todo UNSUBSCRIBE
     }
 
     private boolean isLastMappedResultMatchingActual() {
-        compositeDisposable.add(apiService.getDefault(20, BuildConfig.API_KEY, 0)
-                .map(data -> data.getNews())
+        compositeDisposable.add(apiService.getNews(20, BuildConfig.API_KEY, 0)
+                .map(Response::getNews)
                 .subscribe(news -> title = news.get(0).getTitle()));
-        return title == prefs.getString(QueryPreferences.PREF_LAST_RESULT_ID, null); //todo в каком потоке слушать?
+        return title.equals(prefs.getString(QueryPreferences.PREF_LAST_RESULT_ID, null)); //todo в каком потоке слушать?
     }
 }
