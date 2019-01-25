@@ -9,4 +9,5 @@ class NormalSchedulers : SchedulerProvider {
     override fun io(): Scheduler = Schedulers.io()
     override fun calc(): Scheduler = Schedulers.computation()
     override fun ui(): Scheduler = AndroidSchedulers.mainThread()
+    override fun new(): Scheduler = Schedulers.newThread()
 }

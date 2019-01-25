@@ -55,7 +55,7 @@ public class MainActivity extends BaseActivity implements MainView {
     }
 
     private void loadNews() {
-        if (NetworkChecker.isNetAvailable(this)) {
+        if (NetworkChecker.INSTANCE.isNetAvailable(this)) {
             presenter.getRecentNews(20, offset);
         } else {
 

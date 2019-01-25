@@ -6,4 +6,5 @@ interface SchedulerProvider {
     fun io(): Scheduler
     fun calc(): Scheduler
     fun ui(): Scheduler
+    fun new(): Scheduler
 }

@@ -14,21 +14,13 @@ class GsonModule {
 
     @Singleton
     @Provides
-    fun provideGson(): Gson {
-        return GsonBuilder()
-                .excludeFieldsWithoutExposeAnnotation()
-                .create()
-    }
+    fun provideGson(): Gson = GsonBuilder().excludeFieldsWithoutExposeAnnotation().create()
 
     @Singleton
     @Provides
-    fun provideGsonConverterFactory(gson: Gson): GsonConverterFactory {
-        return GsonConverterFactory.create(gson)
-    }
+    fun provideGsonConverterFactory(gson: Gson): GsonConverterFactory = GsonConverterFactory.create(gson)
 
     @Singleton
     @Provides
-    fun provideJsonConverter(gson: Gson): JsonConverter {
-        return JsonConverterImpl(gson)
-    }
+    fun provideJsonConverter(gson: Gson): JsonConverter = JsonConverterImpl(gson)
 }

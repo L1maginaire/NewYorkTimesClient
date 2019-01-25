@@ -14,15 +14,9 @@ import javax.inject.Singleton
 
 @Module
 class NetworkModule(private val baseUrl: String) {
-
     @Singleton
     @Provides
-    fun provideLoggingInterceptor(): HttpLoggingInterceptor {
-        val loggingInterceptor = HttpLoggingInterceptor()
-        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-
-        return loggingInterceptor
-    }
+    fun provideLoggingInterceptor(): HttpLoggingInterceptor = HttpLoggingInterceptor().apply { this.level =  HttpLoggingInterceptor.Level.BODY }
 
     @Singleton
     @Provides
@@ -44,21 +38,14 @@ class NetworkModule(private val baseUrl: String) {
 
     @Singleton
     @Provides
-    fun provideRetrofit(
-            client: OkHttpClient,
-            converterFactory: GsonConverterFactory
-    ): Retrofit {
-        return Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .addConverterFactory(converterFactory)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .client(client)
-                .build()
-    }
+    fun provideRetrofit(client: OkHttpClient, converterFactory: GsonConverterFactory): Retrofit = Retrofit.Builder()
+                                                                                                    .baseUrl(baseUrl)
+                                                                                                    .addConverterFactory(converterFactory)
+                                                                                                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                                                                                                    .client(client)
+                                                                                                    .build()
 
     @Singleton
     @Provides
-    fun provideApiService(retrofit: Retrofit): NytApi {
-        return retrofit.create(NytApi::class.java)
-    }
+    fun provideApiService(retrofit: Retrofit): NytApi = retrofit.create(NytApi::class.java)
 }
