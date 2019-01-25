@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 
-import com.example.guest.newyorktimesclient.app.NewsApp;
+import com.example.guest.newyorktimesclient.NewsApp;
 import com.example.guest.newyorktimesclient.di.components.ApplicationComponent;
 import com.example.guest.newyorktimesclient.service.PollService;
 

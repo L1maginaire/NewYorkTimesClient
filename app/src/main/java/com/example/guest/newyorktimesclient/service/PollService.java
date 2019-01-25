@@ -16,7 +16,7 @@ import android.util.Log;
 import com.example.guest.newyorktimesclient.BuildConfig;
 import com.example.guest.newyorktimesclient.R;
 import com.example.guest.newyorktimesclient.api.NytApi;
-import com.example.guest.newyorktimesclient.app.NewsApp;
+import com.example.guest.newyorktimesclient.NewsApp;
 import com.example.guest.newyorktimesclient.di.components.DaggerServiceComponent;
 import com.example.guest.newyorktimesclient.di.modules.ServiceModule;
 import com.example.guest.newyorktimesclient.mvp.model.LatestModel.Response;
